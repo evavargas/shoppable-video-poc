@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "vite build && vite build -c vite.live.config.ts && node scripts/size.mjs",
+    "build": "vite build && vite build -c vite.live.config.ts && vite build -c vite.host.config.ts && node scripts/size.mjs",
     "demo": "npm run build && vite preview --port 4173",
     "test": "vitest run",
     "typecheck": "tsc --noEmit"

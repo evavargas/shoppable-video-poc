@@ -18,7 +18,7 @@ Last updated: 2026-11-19.
 | Feature 4: live extras (viewer count, hearts, pinned product) | Done and deployed | Built as planned in section 4 (see the implementation notes there) |
 | Feature 5: gamified discount / secret item | **Planned** (section 5), next to build | |
 | Feature 6: upcoming live (countdown, "Remind me") | Outlined (section 6) | |
-| Feature 7: host control page + auth model + rules | Outlined (section 7) | |
+| Feature 7: host control page + auth model + rules | Built, minimal (`/host.html`): start/end live, pin/unpin, delete chat. Works only on the local emulator; read-only in production. Drop and upcoming-live controls not built | Not deployed until the next `npm run deploy` |
 | Final deploy of features 5 to 7 and README screenshots for them | Pending | |
 
 Numbers at the last check: widget **75.3 KB gzip** (`widget.js`), `live.js` 143.2 KB gzip (lazy), 73 widget tests + 35 function tests passing.

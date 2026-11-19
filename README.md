@@ -305,3 +305,12 @@ shopify/     custom-liquid.html: the snippet to paste into a theme
 2. Deploy: `npm run deploy` builds the widget and the functions, then runs `firebase deploy --project terry-shop` and sends the same Hosting files to the legacy site (`firebase.legacy.json`). With your own project, change the project id and the `site` in `firebase.json` (Cloud Functions need the Blaze plan). The public address of this demo is https://merece.web.app (Hosting site `merece` inside the Firebase project `terry-shop`).
 3. Load the data: `GOOGLE_CLOUD_QUOTA_PROJECT=<id> node firebase/seed.mjs --project <id> --file firebase/prod-data.json` (it overwrites documents with the same ids).
 4. For a Shopify store, replace the `productHandles` in the config with handles that exist in your store, then paste `shopify/custom-liquid.html` into a Custom Liquid section. It already points to `https://merece.web.app/widget.js`; use your own Hosting domain for your own deployment.
+
+## Host panel (`/host.html`, PoC without authentication)
+
+A small page to run a live without the Emulator UI: start/end the live, pin or unpin a product, delete chat messages. It is labeled as a PoC on the page itself.
+
+- **Locally** (`npm run emulators`, then open `http://localhost:5002/host.html`): the page signs in to the **Auth emulator** with an *unsigned* custom token carrying the claim `host: true`. The Firestore rules (`isHost()` in `firebase/firestore.rules`) allow only that claim to update `status` / `pinnedProduct` on `lives/{id}` and to delete chat messages.
+- **In production** the same page loads but is read-only: real Firebase Auth rejects an unsigned token, so every write is denied by the rules (secure by default).
+- **Real auth would be:** Firebase Authentication for the merchant team plus a `host` custom claim set by a trusted server (Admin SDK). The rules would not change.
+- Not covered: automated tests of the rules (only the token/handle helpers are unit tested; the rules were checked by hand against the emulator, including a 403 for an anonymous write).

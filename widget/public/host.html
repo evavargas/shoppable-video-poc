@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="es-UY">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <meta name="color-scheme" content="light dark" />
+    <title>Panel del live · Merece (demo)</title>
+    <link rel="icon" href="/brand/merece-icon.png" />
+    <link rel="stylesheet" href="/merece.css" />
+    <style>
+      main.host { padding-block: 1.5rem 3rem; display: grid; gap: 1.25rem; }
+      .panel { border: 1px solid var(--border, currentColor); border-radius: 1rem; padding: 1rem; display: grid; gap: 0.75rem; }
+      .panel h2 { margin: 0; font-size: 1.1rem; }
+      .row { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
+      .row select { flex: 1 1 12rem; min-width: 0; min-height: 2.5rem; }
+      #chat { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.5rem; }
+      #chat li button { flex: none; white-space: nowrap; }
+      #chat li { display: flex; gap: 0.5rem; justify-content: space-between; align-items: center; overflow-wrap: anywhere; }
+      #msg[data-bad="true"] { font-weight: 700; }
+    </style>
+  </head>
+  <body>
+    <p class="demo-bar"><b>PoC sin autenticación</b> · panel de demostración. Solo funciona contra el emulador local; en producción las reglas bloquean las escrituras.</p>
+    <main class="host wrap">
+      <h1>Panel del live</h1>
+      <p id="mode" role="status">Conectando…</p>
+      <p id="msg" role="status" aria-live="polite"></p>
+
+      <section class="panel" aria-labelledby="h-live">
+        <h2 id="h-live">Live</h2>
+        <p>Estado: <b id="status">…</b></p>
+        <div class="row">
+          <button class="btn btn-primary btn-sm" type="button" id="go-live" data-write disabled>Iniciar live</button>
+          <button class="btn btn-outline btn-sm" type="button" id="end-live" data-write disabled>Terminar live</button>
+        </div>
+      </section>
+
+      <section class="panel" aria-labelledby="h-pin">
+        <h2 id="h-pin">Producto fijado</h2>
+        <p>Ahora: <b id="pinned">…</b></p>
+        <form class="row" id="pin-form">
+          <select id="pin-handle" aria-label="Producto a fijar"></select>
+          <button class="btn btn-primary btn-sm" type="submit" data-write disabled>Fijar</button>
+          <button class="btn btn-outline btn-sm" type="button" id="unpin" data-write disabled>Desfijar</button>
+        </form>
+      </section>
+
+      <section class="panel" aria-labelledby="h-chat">
+        <h2 id="h-chat">Chat (moderación)</h2>
+        <ul id="chat"></ul>
+      </section>
+      <p><a href="/">← Volver a la tienda</a></p>
+    </main>
+    <script src="/host.js"></script>
+  </body>
+</html>

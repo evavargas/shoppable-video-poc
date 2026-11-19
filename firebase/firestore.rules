@@ -6,12 +6,27 @@ service cloud.firestore {
       allow read, write: if false;
     }
 
+    // The host panel (/host.html) signs in with a token that carries the custom claim host == true.
+    // Only a trusted server (Admin SDK) can mint such a token, and the Auth emulator accepts an unsigned one,
+    // so in production nobody can write these fields from a browser; locally the PoC panel can.
+    function isHost() {
+      return request.auth != null && request.auth.token.host == true;
+    }
+
     // Live shopping: anonymous visitors may read, chat and vote, nothing else.
     match /lives/{liveId} {
       allow read: if true;
 
+      // Host only, and only these two fields: start/end the live, pin a product (or null to unpin).
+      allow update: if isHost()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'pinnedProduct'])
+        && request.resource.data.status in ['live', 'scheduled', 'ended']
+        && (request.resource.data.get('pinnedProduct', null) == null
+            || (request.resource.data.pinnedProduct is string && request.resource.data.pinnedProduct.matches('^[A-Za-z0-9_-]{1,255}$')));
+
       match /messages/{messageId} {
         allow read: if true;
+        allow delete: if isHost(); // moderation
         allow create: if request.resource.data.keys().hasOnly(['name', 'text', 'at'])
           && request.resource.data.name is string && request.resource.data.name.size() > 0 && request.resource.data.name.size() <= 24
           && request.resource.data.text is string && request.resource.data.text.size() > 0 && request.resource.data.text.size() <= 200
