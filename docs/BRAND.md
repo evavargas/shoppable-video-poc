@@ -115,6 +115,10 @@ The widget lives in a Shadow DOM, so the store's CSS cannot reach into it. **Cus
 
 `merece.css` maps its own tokens to these in `:root` and again under `html.dark`, so toggling the theme class restyles the widget instantly. No JavaScript talks to it. The `theme.accent` color in the Firestore config is only the fallback when the page sets none.
 
+## Keeping the page clear of the floating player
+
+The floating live player sits on top of the page, so the widget tells the store when it is visible: it sets `data-poc-mini="visible"` on `<html>` and `--poc-mini-clearance` (its height) on `<html>`, and removes both when it is dismissed or the live ends. The widget never edits the page layout itself; the store decides what to do. `merece.css` adds bottom padding to the footer (or to `body` on pages without one) while the attribute is present (`clearance + env(safe-area-inset-bottom)`), so nothing at the end of the page stays hidden behind it and the footer keeps its color down to the bottom.
+
 ## Language
 
 `<html lang="es-UY">` (or `data-lang` on the widget's div) makes the widget Spanish: buttons, screen-reader labels, the live panel and the price format (`$ 1.250,00`). One build serves both languages (`widget/src/i18n.ts`).

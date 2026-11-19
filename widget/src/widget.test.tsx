@@ -404,6 +404,17 @@ describe('Floating live mini-player', () => {
     expect(stop).not.toHaveBeenCalled();
   });
 
+  it('tells the page while it is visible (attribute + height) and clears it when dismissed', async () => {
+    mountMini('live', vi.fn().mockResolvedValue(fakeApi().api));
+    await screen.findByRole('complementary');
+    expect(document.documentElement.dataset.pocMini).toBe('visible');
+    expect(document.documentElement.style.getPropertyValue('--poc-mini-clearance')).toMatch(/px$/);
+
+    await userEvent.click(screen.getByRole('button', { name: 'Dismiss live video' }));
+    expect(document.documentElement.dataset.pocMini).toBeUndefined();
+    expect(document.documentElement.style.getPropertyValue('--poc-mini-clearance')).toBe('');
+  });
+
   it('dismiss hides it, remembers for the session, and a later page does no work at all', async () => {
     const { api, stop } = fakeApi();
     const connect = vi.fn().mockResolvedValue(api);

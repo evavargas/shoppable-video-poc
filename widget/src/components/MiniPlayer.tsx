@@ -38,6 +38,7 @@ export function MiniPlayer({ embeddingId, videos, fetchLiveStatus, connectLive, 
   const [live, setLive] = useState(false);
   const [watching, setWatching] = useState(false);
   const viewed = useRef(false);
+  const miniRef = useRef<HTMLDivElement>(null);
 
   // 1 + 2: the cheap check.
   useEffect(() => {
@@ -81,6 +82,21 @@ export function MiniPlayer({ embeddingId, videos, fetchLiveStatus, connectLive, 
     }
   }, [visible, video, onView]);
 
+  // Tell the page while the player is up (and how tall it is), so the store can leave room at the end of the page.
+  useEffect(() => {
+    if (!visible) return;
+    const root = document.documentElement;
+    const measure = () => root.style.setProperty('--poc-mini-clearance', `${miniRef.current?.offsetHeight ?? 0}px`);
+    root.dataset.pocMini = 'visible';
+    measure();
+    window.addEventListener('resize', measure);
+    return () => {
+      delete root.dataset.pocMini;
+      root.style.removeProperty('--poc-mini-clearance');
+      window.removeEventListener('resize', measure);
+    };
+  }, [visible]);
+
   if (!visible || !video) return null;
 
   function dismiss() {
@@ -93,7 +109,7 @@ export function MiniPlayer({ embeddingId, videos, fetchLiveStatus, connectLive, 
   }
 
   return (
-    <div className="mini" role="complementary" aria-label={t('liveNow')}>
+    <div className="mini" ref={miniRef} role="complementary" aria-label={t('liveNow')}>
       <button type="button" className="mini-open" aria-label={t('watchLive', { title: video.title })} onClick={() => onOpen(index)}>
         <video src={video.src} poster={video.poster} muted loop playsInline autoPlay={!prefersReducedMotion()} />
         <span className="live-pill" aria-hidden="true">
