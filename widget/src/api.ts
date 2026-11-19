@@ -1,3 +1,4 @@
+import { sanitizeHotspots } from './config';
 import { shopifyStore } from './shopify';
 import type { EmbedConfig, Store } from './types';
 
@@ -12,7 +13,11 @@ export async function fetchConfig(apiBase: string, embeddingId: string): Promise
   if (!Array.isArray(data.videos) || typeof data.theme?.accent !== 'string') throw new Error('bad config shape');
   // Media paths in the config are relative to OUR origin ("/media/x.mp4"), not to the store the widget runs on.
   const abs = (u?: string) => (u?.startsWith('/') ? apiBase + u : u);
-  return { ...data, videos: data.videos.map((v) => ({ ...v, src: abs(v.src) ?? v.src, poster: abs(v.poster) })) };
+  return {
+    ...data,
+    layout: data.layout === 'stories' || data.layout === 'floating' ? data.layout : 'carousel', // unknown values fall back to the default
+    videos: data.videos.map((v) => ({ ...v, src: abs(v.src) ?? v.src, poster: abs(v.poster), hotspots: sanitizeHotspots(v) })),
+  };
 }
 
 /**
@@ -23,3 +28,11 @@ export const mockStore: Store = {
   getProduct: shopifyStore.getProduct,
   addToCart: () => new Promise((resolve) => setTimeout(resolve, 400)),
 };
+
+/** Cheap "is a live on right now?" check. Any failure counts as "not live": the mini-player just doesn't appear. */
+export async function fetchLiveStatus(apiBase: string, liveId: string): Promise<string> {
+  const res = await fetch(`${apiBase}/api/liveStatus?id=${encodeURIComponent(liveId)}`, { signal: AbortSignal.timeout(4000) });
+  if (!res.ok) return 'ended';
+  const data = (await res.json()) as { status?: unknown };
+  return typeof data.status === 'string' ? data.status : 'ended';
+}

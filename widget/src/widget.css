@@ -398,3 +398,294 @@ button:focus-visible {
   border-radius: var(--radius);
   font: inherit;
 }
+
+/* Timed product hotspots */
+.hotspot {
+  position: absolute;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 60%;
+  padding: 6px 12px 6px 8px;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.68);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transform: translate(-14px, -50%); /* the dot sits exactly on the x/y point */
+  animation: hs-in 0.2s ease-out;
+}
+
+.hotspot.flip {
+  flex-direction: row-reverse;
+  padding: 6px 8px 6px 12px;
+  transform: translate(calc(-100% + 14px), -50%);
+}
+
+.hs-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.hs-dot {
+  flex: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.7);
+  animation: hs-pulse 1.6s ease-out infinite;
+}
+
+@keyframes hs-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes hs-pulse {
+  to {
+    box-shadow: 0 0 0 10px rgba(255, 255, 255, 0);
+  }
+}
+
+.sheet {
+  position: absolute;
+  inset: auto 8px 8px 8px;
+  z-index: 3;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
+  animation: pop-in 0.18s ease-out;
+}
+
+.sheet:focus {
+  outline: none;
+}
+
+.sheet-close {
+  position: absolute;
+  top: -14px;
+  right: 8px;
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: 50%;
+  background: #111;
+  color: #fff;
+  cursor: pointer;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hotspot,
+  .hs-dot,
+  .sheet {
+    animation: none !important;
+  }
+}
+
+/* Stories layout */
+:host([data-layout='stories']) {
+  min-height: 104px; /* the merchant's div should reserve the same height inline */
+}
+
+/* Floating layout: the host takes no room, and must not become the containing block of the fixed mini-player. */
+:host([data-layout='floating']) {
+  min-height: 0;
+  contain: none;
+}
+
+.stories {
+  display: flex;
+  gap: 14px;
+  height: 104px;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 6px 16px 8px;
+  list-style: none;
+  overflow-x: auto;
+  scroll-padding-inline: 16px;
+}
+
+.story {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  width: 72px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+}
+
+.ring {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 68px;
+  height: 68px;
+  box-sizing: border-box;
+  border: 3px solid var(--accent);
+  border-radius: 50%;
+  background: #fff;
+}
+
+.ring.skeleton {
+  border-color: #e6e6e6;
+  background: #e6e6e6;
+}
+
+.story.seen .ring {
+  border-color: #b9b9b9; /* opened: the ring goes grey */
+}
+
+.ring img,
+.fallback {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.fallback {
+  display: grid;
+  place-items: center;
+  background: #e6e6e6;
+  font-weight: 700;
+}
+
+.story-live {
+  position: absolute;
+  bottom: -7px;
+  padding: 1px 6px;
+  border: 2px solid #fff;
+  border-radius: 999px;
+  background: #c4001a;
+  color: #fff;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.story-label {
+  max-width: 72px;
+  overflow: hidden;
+  font-size: 11px;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Progress bars in the player */
+.progress {
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  left: 12px;
+  z-index: 2;
+  display: flex;
+  gap: 4px;
+}
+
+.seg {
+  flex: 1;
+  height: 3px;
+  overflow: hidden;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.35);
+}
+
+.fill {
+  display: block;
+  height: 100%;
+  background: #fff;
+  transition: width 0.25s linear;
+}
+
+.stage.story-mode .counter {
+  top: 26px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fill {
+    transition: none;
+  }
+}
+
+/* Floating live mini-player */
+.mini {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 2147483000;
+  width: 116px;
+  height: 206px;
+  overflow: hidden;
+  border-radius: 14px;
+  background: #000;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  animation: mini-in 0.3s ease-out;
+}
+
+.mini-open {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: #000;
+  color: #fff;
+  cursor: pointer;
+}
+
+.mini-open video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.mini-title {
+  position: absolute;
+  inset: auto 0 0 0;
+  padding: 18px 8px 8px;
+  background: rgba(0, 0, 0, 0.6);
+  font-size: 11px;
+  line-height: 1.25;
+  text-align: left;
+}
+
+.mini-close {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  z-index: 1;
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.7);
+  color: #fff;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+@keyframes mini-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mini {
+    animation: none;
+  }
+}

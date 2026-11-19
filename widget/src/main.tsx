@@ -1,4 +1,4 @@
-import { fetchConfig, mockStore } from './api';
+import { fetchConfig, fetchLiveStatus, mockStore } from './api';
 import { makeLiveConnector } from './live-loader';
 import { mount } from './mount';
 import { shopifyStore } from './shopify';
@@ -21,6 +21,7 @@ function init() {
       const store = host.dataset.store === 'mock' ? mockStore : shopifyStore;
       mount(host, {
         loadConfig: (id) => fetchConfig(apiBase, id),
+        fetchLiveStatus: (liveId) => fetchLiveStatus(apiBase, liveId),
         store,
         track: makeTracker(apiBase, host.dataset.embeddingId ?? ''),
         connectLive,

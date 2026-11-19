@@ -37,6 +37,7 @@
       .cart b { min-width: 22px; padding: 1px 6px; border-radius: 999px; background: var(--accent); color: var(--accent-ink); font-size: 12px; text-align: center; transition: transform .2s; }
       .cart b.bump { transform: scale(1.35); }
 
+      .stories-bar { background: var(--card); border-bottom: 1px solid var(--line); padding: 8px 0 2px; }
       .hero { padding: 32px 0 40px; }
       .hero .wrap { display: grid; gap: 28px; }
       .hero h1 { margin: 0 0 14px; font-size: clamp(36px, 7vw, 60px); line-height: 1.05; }
@@ -110,6 +111,13 @@
       </div>
     </header>
 
+    <div class="stories-bar">
+      <div class="wrap">
+        <!-- Same widget, "stories" layout (set in Firestore). data-layout lets the skeleton match; min-height reserves the space inline. -->
+        <div class="embed" data-source="poc" data-embedding-id="demo-stories" data-layout="stories" data-store="mock" style="min-height: 104px"></div>
+      </div>
+    </div>
+
     <main>
       <section class="hero">
         <div class="wrap">
@@ -179,6 +187,9 @@
         </p>
       </div>
     </footer>
+
+    <!-- Floating live mini-player: zero height, shown bottom-right on every page while a live is on. -->
+    <div data-source="poc" data-embedding-id="demo-live" data-layout="floating" data-store="mock"></div>
 
     <!-- The widget. async: it never blocks the page. -->
     <script async src="./widget.js"></script>

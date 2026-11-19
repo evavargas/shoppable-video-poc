@@ -9,19 +9,33 @@ export interface Product {
   available: boolean;
 }
 
+/** A tappable chip on the video while it plays: shown between `start` and `end` seconds, at x/y percent of the frame. */
+export interface Hotspot {
+  handle: string; // must be one of the video's productHandles
+  start: number;
+  end: number;
+  x: number; // 0..100, from the left
+  y: number; // 0..100, from the top
+}
+
 export interface Video {
   id: string;
   src: string;
   poster?: string;
   title: string;
+  label?: string; // short name under a story avatar; falls back to the title
   productHandles: string[];
+  hotspots?: Hotspot[];
   liveId?: string; // present = this video has live chat and a poll
 }
+
+export type Layout = 'carousel' | 'stories' | 'floating';
 
 /** What the backend returns for one embedding (stored in Firestore). */
 export interface EmbedConfig {
   embeddingId: string;
   theme: { accent: string };
+  layout?: Layout;
   videos: Video[];
   firebase?: FirebaseSettings;
 }
@@ -56,6 +70,8 @@ export interface Poll {
 /** Implemented by live.js (the Firebase bundle). The main widget only knows this interface. */
 export interface LiveApi {
   watchPoll(liveId: string, sessionId: string, cb: (poll: Poll | null) => void): () => void;
+  /** Real-time `status` of the live ('live', 'scheduled', 'ended'); null if the document does not exist. */
+  watchStatus(liveId: string, cb: (status: string | null) => void): () => void;
   watchMessages(liveId: string, cb: (messages: ChatMessage[]) => void): () => void;
   sendMessage(liveId: string, name: string, text: string): Promise<void>;
   vote(liveId: string, sessionId: string, optionId: string): Promise<void>;

@@ -76,6 +76,14 @@ export function connect(settings: FirebaseSettings): LiveApi {
       };
     },
 
+    watchStatus(liveId, cb) {
+      return onSnapshot(
+        doc(db, 'lives', liveId),
+        (snap) => cb(snap.exists() ? String(snap.get('status') ?? 'ended') : null),
+        (err) => console.warn('[poc] status listener failed', err.code),
+      );
+    },
+
     async sendMessage(liveId, name, text) {
       await addDoc(collection(db, 'lives', liveId, 'messages'), { name, text, at: serverTimestamp() });
     },

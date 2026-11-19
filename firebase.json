@@ -6,6 +6,7 @@
     "rewrites": [
       { "source": "/api/getEmbedConfig", "function": { "functionId": "getEmbedConfig", "region": "southamerica-east1" } },
       { "source": "/api/track", "function": { "functionId": "track", "region": "southamerica-east1" } },
+      { "source": "/api/liveStatus", "function": { "functionId": "getLiveStatus", "region": "southamerica-east1" } },
       { "source": "/api/stats", "function": { "functionId": "getStats", "region": "southamerica-east1" } }
     ],
     "headers": [

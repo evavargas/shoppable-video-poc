@@ -5,6 +5,7 @@ import { Carousel } from './components/Carousel';
 import { mount } from './mount';
 import { intersect } from './test-setup';
 import { Live } from './components/Live';
+import { Stories } from './components/Stories';
 import type { ChatMessage, EmbedConfig, LiveApi, Poll, Product, Store } from './types';
 
 const product: Product = { handle: 'tee', title: 'Cotton Tee', price: 29, currency: 'USD', variantId: 7, available: true };
@@ -28,6 +29,7 @@ const twoVideos: EmbedConfig = {
 
 const track = vi.fn();
 const connectLive = vi.fn().mockRejectedValue(new Error('no live in this test'));
+const fetchLiveStatus = vi.fn().mockResolvedValue('ended');
 
 beforeEach(() => vi.clearAllMocks());
 
@@ -99,7 +101,7 @@ describe('Carousel card', () => {
 
 describe('Player', () => {
   const openPlayer = async (store = makeStore()) => {
-    render(<App embeddingId="t" loadConfig={async () => twoVideos} store={store} track={track} connectLive={connectLive} onFail={() => {}} />);
+    render(<App embeddingId="t" loadConfig={async () => twoVideos} store={store} track={track} connectLive={connectLive} fetchLiveStatus={fetchLiveStatus} onFail={() => {}} />);
     await userEvent.click(await screen.findByRole('button', { name: /watch: summer layers/i }));
     await screen.findByRole('dialog');
   };
@@ -111,6 +113,7 @@ describe('Player', () => {
     expect(screen.getByRole('button', { name: 'Previous video' })).toBeDisabled();
 
     await userEvent.click(screen.getByRole('button', { name: 'Next video' }));
+    expect(document.querySelectorAll('dialog video')).toHaveLength(1); // the previous video element is replaced, not kept
     expect(counter()).toContain('Winter coats · 2/2');
     expect(track).toHaveBeenCalledWith({ type: 'video_click', videoId: 'v2' });
     expect(screen.getByRole('button', { name: 'Next video' })).toBeDisabled();
@@ -143,10 +146,299 @@ describe('Player', () => {
   });
 });
 
+describe('Hotspots', () => {
+  const withHotspots: EmbedConfig = {
+    ...config,
+    videos: [
+      {
+        id: 'v1',
+        src: 'https://x.test/v1.mp4',
+        title: 'Summer layers',
+        productHandles: ['tee'],
+        hotspots: [{ handle: 'tee', start: 2, end: 5, x: 30, y: 40 }],
+      },
+    ],
+  };
+  const seek = (t: number) => {
+    const video = document.querySelector('dialog video')!;
+    Object.defineProperty(video, 'currentTime', { value: t, configurable: true });
+    act(() => {
+      fireEvent.timeUpdate(video);
+    });
+  };
+  const open = async (store = makeStore(), cfg = withHotspots) => {
+    render(<App embeddingId="t" loadConfig={async () => cfg} store={store} track={track} connectLive={connectLive} fetchLiveStatus={fetchLiveStatus} onFail={() => {}} />);
+    await userEvent.click(await screen.findByRole('button', { name: /watch: summer layers/i }));
+    await screen.findByRole('dialog');
+    return store;
+  };
+
+  it('shows the chip only during its time window, positioned at x/y percent', async () => {
+    await open();
+    seek(1);
+    expect(screen.queryByRole('button', { name: 'Shop Cotton Tee' })).toBeNull();
+    seek(3);
+    const chip = await screen.findByRole('button', { name: 'Shop Cotton Tee' });
+    expect(chip).toHaveStyle({ left: '30%', top: '40%' });
+    seek(5); // end is exclusive
+    expect(screen.queryByRole('button', { name: 'Shop Cotton Tee' })).toBeNull();
+  });
+
+  it('opens the product card on tap, pauses the video, tracks it, and adds to cart from the card', async () => {
+    const store = await open();
+    seek(3);
+    await userEvent.click(await screen.findByRole('button', { name: 'Shop Cotton Tee' }));
+
+    const card = await screen.findByRole('region', { name: /cotton tee details/i });
+    expect(track).toHaveBeenCalledWith({ type: 'hotspot_click', videoId: 'v1', productHandle: 'tee' });
+    expect(HTMLMediaElement.prototype.pause).toHaveBeenCalled();
+
+    const add = card.querySelector('.btn') as HTMLElement;
+    await userEvent.click(add);
+    expect(store.addToCart).toHaveBeenCalledWith(product);
+    await vi.waitFor(() =>
+      expect(track).toHaveBeenCalledWith({ type: 'add_to_cart', videoId: 'v1', productHandle: 'tee', value: 29, currency: 'USD' }),
+    );
+
+    vi.mocked(HTMLMediaElement.prototype.play).mockClear();
+    await userEvent.click(screen.getByRole('button', { name: 'Close product' }));
+    expect(screen.queryByRole('region', { name: /details/i })).toBeNull();
+    expect(HTMLMediaElement.prototype.play).toHaveBeenCalled(); // resumes
+  });
+
+  it('Esc closes the product card first, and the player only on the next Esc', async () => {
+    await open();
+    seek(3);
+    await userEvent.click(await screen.findByRole('button', { name: 'Shop Cotton Tee' }));
+    await screen.findByRole('region', { name: /details/i });
+
+    fireEvent(screen.getByRole('dialog'), new Event('cancel', { cancelable: true }));
+    expect(screen.queryByRole('region', { name: /details/i })).toBeNull();
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+  });
+
+  it('flips the chip to the left of its dot near the right edge, and skips products that fail to load', async () => {
+    const right: EmbedConfig = {
+      ...withHotspots,
+      videos: [{ ...withHotspots.videos[0]!, hotspots: [{ handle: 'tee', start: 0, end: 5, x: 85, y: 20 }] }],
+    };
+    await open(makeStore(), right);
+    seek(1);
+    expect(await screen.findByRole('button', { name: 'Shop Cotton Tee' })).toHaveClass('flip');
+  });
+
+  it('renders no chip when the product cannot be loaded', async () => {
+    const broken: Store = { ...makeStore(), getProduct: vi.fn().mockRejectedValue(new Error('404')) };
+    await open(broken);
+    seek(3);
+    await new Promise((r) => setTimeout(r, 50));
+    expect(screen.queryByRole('button', { name: /shop/i })).toBeNull();
+  });
+});
+
+describe('Stories layout', () => {
+  const storiesConfig: EmbedConfig = {
+    ...twoVideos,
+    layout: 'stories',
+    videos: [
+      { ...twoVideos.videos[0]!, label: 'Layers', poster: 'https://x.test/1.jpg', liveId: 'l1' },
+      { ...twoVideos.videos[1]!, label: 'Coats' },
+    ],
+  };
+  const renderStories = () =>
+    render(<App embeddingId="s" loadConfig={async () => storiesConfig} store={makeStore()} track={track} connectLive={connectLive} fetchLiveStatus={fetchLiveStatus} onFail={() => {}} layoutHint="stories" />);
+
+  beforeEach(() => sessionStorage.clear());
+
+  it('shows the loading skeleton at the stories height, then round avatars with labels and a LIVE badge', async () => {
+    let release: (c: EmbedConfig) => void = () => {};
+    render(
+      <App embeddingId="s" loadConfig={() => new Promise((r) => (release = r))} store={makeStore()} track={track} connectLive={connectLive} fetchLiveStatus={fetchLiveStatus} onFail={() => {}} layoutHint="stories" />,
+    );
+    expect(screen.getByLabelText('Loading stories')).toBeInTheDocument();
+    await act(async () => release(storiesConfig));
+    expect(await screen.findByRole('list', { name: 'Stories' })).toBeInTheDocument();
+    expect(screen.getByText('Layers')).toBeInTheDocument();
+    expect(screen.getByText('LIVE')).toBeInTheDocument();
+    expect(screen.queryByRole('list', { name: /shop the videos/i })).toBeNull(); // not the carousel
+  });
+
+  it('tracks story_open (not video_click), marks the story seen for the session, and opens the player with progress bars', async () => {
+    renderStories();
+    await userEvent.click(await screen.findByRole('button', { name: /open story: summer layers, live$/i }));
+    await screen.findByRole('dialog');
+
+    expect(track).toHaveBeenCalledWith({ type: 'story_open', videoId: 'v1' });
+    expect(track).not.toHaveBeenCalledWith(expect.objectContaining({ type: 'video_click' }));
+    expect(document.querySelectorAll('.seg')).toHaveLength(2);
+    expect(JSON.parse(sessionStorage.getItem('poc-seen:s')!)).toEqual(['v1']);
+  });
+
+  it('shows the ring as seen on the next visit in the same session', async () => {
+    sessionStorage.setItem('poc-seen:s', JSON.stringify(['v2']));
+    renderStories();
+    expect(await screen.findByRole('button', { name: /open story: winter coats, seen/i })).toHaveClass('seen');
+    expect(screen.getByRole('button', { name: /open story: summer layers/i })).not.toHaveClass('seen');
+  });
+
+  it('counts one view per avatar, only once it is on screen', async () => {
+    const onView = vi.fn();
+    render(<Stories videos={storiesConfig.videos} seen={new Set()} onOpen={() => {}} onView={onView} />);
+    const avatar = screen.getByRole('button', { name: /summer layers/i });
+    intersect(avatar, 0.3);
+    expect(onView).not.toHaveBeenCalled();
+    intersect(avatar, 0.9);
+    intersect(avatar, 0);
+    intersect(avatar, 0.9);
+    expect(onView).toHaveBeenCalledTimes(1);
+  });
+
+  it('fills the progress bar with playback and moves to the next story when one ends; the last one closes the player', async () => {
+    renderStories();
+    await userEvent.click(await screen.findByRole('button', { name: /open story: summer layers/i }));
+    await screen.findByRole('dialog');
+    const video = () => document.querySelector('dialog video')!;
+    expect(video()).not.toHaveAttribute('loop'); // stories play once
+
+    Object.defineProperty(video(), 'duration', { value: 10, configurable: true });
+    Object.defineProperty(video(), 'currentTime', { value: 4, configurable: true });
+    act(() => {
+      fireEvent.timeUpdate(video());
+    });
+    expect((document.querySelectorAll('.fill')[0] as HTMLElement).style.width).toBe('40%');
+
+    act(() => {
+      fireEvent.ended(video());
+    });
+    expect(document.querySelector('.counter')!.textContent).toContain('2/2');
+    expect(track).toHaveBeenCalledWith({ type: 'story_open', videoId: 'v2' });
+    expect((document.querySelectorAll('.fill')[0] as HTMLElement).style.width).toBe('100%'); // previous story is complete
+
+    act(() => {
+      fireEvent.ended(video());
+    });
+    await vi.waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+  });
+});
+
+describe('Floating live mini-player', () => {
+  const floating: EmbedConfig = {
+    ...twoVideos,
+    layout: 'floating',
+    firebase: { projectId: 'p' }, // without it the widget can't reach live.js
+    videos: [twoVideos.videos[0]!, { ...twoVideos.videos[1]!, liveId: 'l1', poster: 'https://x.test/2.jpg' }],
+  };
+
+  function fakeApi() {
+    let onStatus: (s: string | null) => void = () => {};
+    const stop = vi.fn();
+    const api = { watchStatus: vi.fn((_id: string, cb: (s: string | null) => void) => ((onStatus = cb), stop)) } as unknown as LiveApi;
+    return { api, stop, status: (st: string | null) => act(() => onStatus(st)) };
+  }
+
+  const mountMini = (status: string, connect = connectLive) => {
+    const check = vi.fn().mockResolvedValue(status);
+    render(<App embeddingId="m" loadConfig={async () => floating} store={makeStore()} track={track} connectLive={connect} fetchLiveStatus={check} layoutHint="floating" onFail={() => {}} />);
+    return check;
+  };
+
+  beforeEach(() => sessionStorage.clear());
+
+  it('shows nothing, and never loads live.js, when no live is on', async () => {
+    const connect = vi.fn();
+    const check = mountMini('ended', connect);
+    await vi.waitFor(() => expect(check).toHaveBeenCalledWith('l1'));
+    expect(screen.queryByRole('complementary')).toBeNull();
+    expect(connect).not.toHaveBeenCalled(); // lazy: no Firebase for pages without a live
+  });
+
+  it('appears when a live is on, loads live.js, and follows the host ending and restarting the live', async () => {
+    const { api, stop, status } = fakeApi();
+    mountMini('live', vi.fn().mockResolvedValue(api));
+
+    const mini = await screen.findByRole('complementary', { name: 'Live now' });
+    expect(mini).toHaveTextContent('LIVE');
+    expect(track).toHaveBeenCalledWith({ type: 'view', videoId: 'v2' });
+    await vi.waitFor(() => expect(api.watchStatus).toHaveBeenCalledWith('l1', expect.any(Function)));
+
+    status('ended');
+    expect(screen.queryByRole('complementary')).toBeNull();
+    status('live');
+    expect(await screen.findByRole('complementary')).toBeInTheDocument();
+    expect(track.mock.calls.filter(([e]) => e.type === 'view')).toHaveLength(1); // still one impression
+    expect(stop).not.toHaveBeenCalled();
+  });
+
+  it('dismiss hides it, remembers for the session, and a later page does no work at all', async () => {
+    const { api, stop } = fakeApi();
+    const connect = vi.fn().mockResolvedValue(api);
+    const { unmount } = render(
+      <App embeddingId="m" loadConfig={async () => floating} store={makeStore()} track={track} connectLive={connect} fetchLiveStatus={vi.fn().mockResolvedValue('live')} layoutHint="floating" onFail={() => {}} />,
+    );
+    await userEvent.click(await screen.findByRole('button', { name: 'Dismiss live video' }));
+    expect(screen.queryByRole('complementary')).toBeNull();
+    expect(sessionStorage.getItem('poc-mini-dismissed:m')).toBe('1');
+    expect(stop).toHaveBeenCalled(); // listener closed
+    unmount();
+
+    connect.mockClear();
+    const check = mountMini('live', connect);
+    await new Promise((r) => setTimeout(r, 50));
+    expect(check).not.toHaveBeenCalled();
+    expect(connect).not.toHaveBeenCalled();
+    expect(screen.queryByRole('complementary')).toBeNull();
+  });
+
+  it('expands into the full player on the live video, hides itself meanwhile, and returns after closing', async () => {
+    mountMini('live', vi.fn().mockResolvedValue(fakeApi().api));
+    await userEvent.click(await screen.findByRole('button', { name: /watch live: winter coats/i }));
+
+    await screen.findByRole('dialog');
+    expect(document.querySelector('.counter')!.textContent).toContain('Winter coats · 2/2');
+    expect(track).toHaveBeenCalledWith({ type: 'video_click', videoId: 'v2' });
+    expect(screen.queryByRole('complementary')).toBeNull();
+
+    await userEvent.click(screen.getByRole('button', { name: 'Close video' }));
+    await vi.waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    expect(await screen.findByRole('complementary')).toBeInTheDocument();
+  });
+
+  it('stays hidden when the status check fails, and works when sessionStorage is blocked', async () => {
+    const failing = vi.fn().mockRejectedValue(new Error('offline'));
+    const { unmount } = render(
+      <App embeddingId="m" loadConfig={async () => floating} store={makeStore()} track={track} connectLive={connectLive} fetchLiveStatus={failing} layoutHint="floating" onFail={() => {}} />,
+    );
+    await vi.waitFor(() => expect(failing).toHaveBeenCalled());
+    expect(screen.queryByRole('complementary')).toBeNull();
+    unmount();
+
+    const spy = vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
+      throw new Error('blocked');
+    });
+    try {
+      mountMini('live', vi.fn().mockResolvedValue(fakeApi().api));
+      expect(await screen.findByRole('complementary')).toBeInTheDocument();
+    } finally {
+      spy.mockRestore();
+    }
+  });
+
+  it('does not autoplay the preview for users who prefer reduced motion', async () => {
+    Object.defineProperty(window, 'matchMedia', { value: () => ({ matches: true }), configurable: true });
+    try {
+      mountMini('live', vi.fn().mockResolvedValue(fakeApi().api));
+      await screen.findByRole('complementary');
+      expect(document.querySelector('.mini video')).not.toHaveAttribute('autoplay');
+    } finally {
+      delete (window as { matchMedia?: unknown }).matchMedia;
+    }
+  });
+});
+
 describe('App', () => {
   it('opens the player and adds the product to the cart', async () => {
     const store = makeStore();
-    render(<App embeddingId="t" loadConfig={async () => config} store={store} track={track} connectLive={connectLive} onFail={() => {}} />);
+    render(<App embeddingId="t" loadConfig={async () => config} store={store} track={track} connectLive={connectLive} fetchLiveStatus={fetchLiveStatus} onFail={() => {}} />);
 
     await userEvent.click(await screen.findByRole('button', { name: /watch: summer layers/i }));
     await userEvent.click(await screen.findByRole('button', { name: /add to cart/i }));
@@ -161,21 +453,21 @@ describe('App', () => {
   it('shows Shopify\'s error when add to cart fails, and disables sold-out products', async () => {
     const store = makeStore();
     vi.mocked(store.addToCart).mockRejectedValue(new Error('All 3 are in your cart.'));
-    const { unmount } = render(<App embeddingId="t" loadConfig={async () => config} store={store} track={track} connectLive={connectLive} onFail={() => {}} />);
+    const { unmount } = render(<App embeddingId="t" loadConfig={async () => config} store={store} track={track} connectLive={connectLive} fetchLiveStatus={fetchLiveStatus} onFail={() => {}} />);
     await userEvent.click(await screen.findByRole('button', { name: /watch: summer layers/i }));
     await userEvent.click(await screen.findByRole('button', { name: /add to cart/i }));
     expect(await screen.findByText('All 3 are in your cart.')).toBeInTheDocument();
     expect(track).not.toHaveBeenCalledWith(expect.objectContaining({ type: 'add_to_cart' })); // failed adds are not revenue
     unmount();
 
-    render(<App embeddingId="t" loadConfig={async () => config} store={makeStore({ ...product, available: false })} track={track} connectLive={connectLive} onFail={() => {}} />);
+    render(<App embeddingId="t" loadConfig={async () => config} store={makeStore({ ...product, available: false })} track={track} connectLive={connectLive} fetchLiveStatus={fetchLiveStatus} onFail={() => {}} />);
     await userEvent.click(await screen.findByRole('button', { name: /watch: summer layers/i }));
     expect(await screen.findByRole('button', { name: /sold out/i })).toBeDisabled();
   });
 
   it('calls onFail when config fails to load', async () => {
     const onFail = vi.fn();
-    render(<App embeddingId="t" loadConfig={() => Promise.reject(new Error('down'))} store={makeStore()} track={track} connectLive={connectLive} onFail={onFail} />);
+    render(<App embeddingId="t" loadConfig={() => Promise.reject(new Error('down'))} store={makeStore()} track={track} connectLive={connectLive} fetchLiveStatus={fetchLiveStatus} onFail={onFail} />);
     await vi.waitFor(() => expect(onFail).toHaveBeenCalled());
   });
 });
@@ -186,7 +478,7 @@ describe('mount', () => {
     host.dataset.embeddingId = 't';
     document.body.append(host);
 
-    mount(host, { loadConfig: () => Promise.reject(new Error('down')), store: makeStore(), track, connectLive });
+    mount(host, { loadConfig: () => Promise.reject(new Error('down')), store: makeStore(), track, connectLive, fetchLiveStatus });
 
     expect(host.shadowRoot).not.toBeNull();
     expect(host.shadowRoot!.querySelector('style')).not.toBeNull();
@@ -198,7 +490,12 @@ describe('Live', () => {
   function fakeLive() {
     let onPoll: (p: Poll | null) => void = () => {};
     let onMessages: (m: ChatMessage[]) => void = () => {};
+    let onStatus: (s: string | null) => void = () => {};
     const api: LiveApi = {
+      watchStatus: vi.fn((_id, cb) => {
+        onStatus = cb;
+        return vi.fn();
+      }),
       watchPoll: vi.fn((_id, _s, cb) => {
         onPoll = cb;
         return vi.fn();
@@ -210,7 +507,14 @@ describe('Live', () => {
       sendMessage: vi.fn().mockResolvedValue(undefined),
       vote: vi.fn().mockResolvedValue(undefined),
     };
-    return { api, push: { poll: (p: Poll) => act(() => onPoll(p)), messages: (m: ChatMessage[]) => act(() => onMessages(m)) } };
+    return {
+      api,
+      push: {
+        poll: (p: Poll) => act(() => onPoll(p)),
+        messages: (m: ChatMessage[]) => act(() => onMessages(m)),
+        status: (st: string | null) => act(() => onStatus(st)),
+      },
+    };
   }
 
   it('shows realtime chat and poll, sends messages and votes', async () => {

@@ -12,6 +12,15 @@
           "poster": "/media/coffee-pour.jpg",
           "productHandles": [
             "house-blend-coffee"
+          ],
+          "hotspots": [
+            {
+              "handle": "house-blend-coffee",
+              "start": 1.5,
+              "end": 10,
+              "x": 52,
+              "y": 58
+            }
           ]
         },
         {
@@ -21,6 +30,15 @@
           "poster": "/media/choco-croissant.jpg",
           "productHandles": [
             "chocolate-croissant"
+          ],
+          "hotspots": [
+            {
+              "handle": "chocolate-croissant",
+              "start": 0.8,
+              "end": 6.8,
+              "x": 50,
+              "y": 45
+            }
           ]
         },
         {
@@ -29,7 +47,24 @@
           "src": "/media/pastry-case.mp4",
           "poster": "/media/pastry-case.jpg",
           "productHandles": [
-            "weekend-pastry-box"
+            "weekend-pastry-box",
+            "chocolate-croissant"
+          ],
+          "hotspots": [
+            {
+              "handle": "chocolate-croissant",
+              "start": 1,
+              "end": 9,
+              "x": 33,
+              "y": 48
+            },
+            {
+              "handle": "weekend-pastry-box",
+              "start": 3,
+              "end": 10,
+              "x": 62,
+              "y": 76
+            }
           ]
         },
         {
@@ -39,6 +74,15 @@
           "poster": "/media/dough-roll.jpg",
           "productHandles": [
             "rustic-flatbreads"
+          ],
+          "hotspots": [
+            {
+              "handle": "rustic-flatbreads",
+              "start": 2,
+              "end": 11,
+              "x": 57,
+              "y": 58
+            }
           ]
         },
         {
@@ -49,7 +93,16 @@
           "productHandles": [
             "country-sourdough"
           ],
-          "liveId": "bakery-live"
+          "liveId": "bakery-live",
+          "hotspots": [
+            {
+              "handle": "country-sourdough",
+              "start": 1.5,
+              "end": 11,
+              "x": 47,
+              "y": 26
+            }
+          ]
         }
       ]
     },
@@ -66,7 +119,16 @@
           "productHandles": [
             "chocolate-cake"
           ],
-          "liveId": "bakery-live"
+          "liveId": "bakery-live",
+          "hotspots": [
+            {
+              "handle": "chocolate-cake",
+              "start": 0.8,
+              "end": 6.8,
+              "x": 50,
+              "y": 45
+            }
+          ]
         },
         {
           "id": "v2",
@@ -75,6 +137,15 @@
           "poster": "/media/pastry-case.jpg",
           "productHandles": [
             "lemon-pie"
+          ],
+          "hotspots": [
+            {
+              "handle": "lemon-pie",
+              "start": 1,
+              "end": 10,
+              "x": 50,
+              "y": 52
+            }
           ]
         },
         {
@@ -84,9 +155,237 @@
           "poster": "/media/dough-roll.jpg",
           "productHandles": [
             "rolls-de-canela"
+          ],
+          "hotspots": [
+            {
+              "handle": "rolls-de-canela",
+              "start": 2,
+              "end": 11,
+              "x": 57,
+              "y": 58
+            }
           ]
         }
       ]
+    },
+    "demo-stories": {
+      "theme": {
+        "accent": "#9a3412"
+      },
+      "videos": [
+        {
+          "id": "v1",
+          "title": "Pour-over, the slow way",
+          "src": "/media/coffee-pour.mp4",
+          "poster": "/media/coffee-pour.jpg",
+          "productHandles": [
+            "house-blend-coffee"
+          ],
+          "hotspots": [
+            {
+              "handle": "house-blend-coffee",
+              "start": 1.5,
+              "end": 10,
+              "x": 52,
+              "y": 58
+            }
+          ],
+          "label": "Pour-over"
+        },
+        {
+          "id": "v2",
+          "title": "Chocolate croissant, dipped",
+          "src": "/media/choco-croissant.mp4",
+          "poster": "/media/choco-croissant.jpg",
+          "productHandles": [
+            "chocolate-croissant"
+          ],
+          "hotspots": [
+            {
+              "handle": "chocolate-croissant",
+              "start": 0.8,
+              "end": 6.8,
+              "x": 50,
+              "y": 45
+            }
+          ],
+          "label": "Croissant"
+        },
+        {
+          "id": "v3",
+          "title": "Inside our pastry case",
+          "src": "/media/pastry-case.mp4",
+          "poster": "/media/pastry-case.jpg",
+          "productHandles": [
+            "weekend-pastry-box",
+            "chocolate-croissant"
+          ],
+          "hotspots": [
+            {
+              "handle": "chocolate-croissant",
+              "start": 1,
+              "end": 9,
+              "x": 33,
+              "y": 48
+            },
+            {
+              "handle": "weekend-pastry-box",
+              "start": 3,
+              "end": 10,
+              "x": 62,
+              "y": 76
+            }
+          ],
+          "label": "Pastry case"
+        },
+        {
+          "id": "v4",
+          "title": "Shaping flatbreads by hand",
+          "src": "/media/dough-roll.mp4",
+          "poster": "/media/dough-roll.jpg",
+          "productHandles": [
+            "rustic-flatbreads"
+          ],
+          "hotspots": [
+            {
+              "handle": "rustic-flatbreads",
+              "start": 2,
+              "end": 11,
+              "x": 57,
+              "y": 58
+            }
+          ],
+          "label": "Flatbreads"
+        },
+        {
+          "id": "v5",
+          "title": "Live: sourdough Saturday",
+          "src": "/media/sourdough-knead.mp4",
+          "poster": "/media/sourdough-knead.jpg",
+          "productHandles": [
+            "country-sourdough"
+          ],
+          "liveId": "bakery-live",
+          "hotspots": [
+            {
+              "handle": "country-sourdough",
+              "start": 1.5,
+              "end": 11,
+              "x": 47,
+              "y": 26
+            }
+          ],
+          "label": "Live bake"
+        }
+      ],
+      "layout": "stories"
+    },
+    "demo-live": {
+      "theme": {
+        "accent": "#9a3412"
+      },
+      "videos": [
+        {
+          "id": "v1",
+          "title": "Pour-over, the slow way",
+          "src": "/media/coffee-pour.mp4",
+          "poster": "/media/coffee-pour.jpg",
+          "productHandles": [
+            "house-blend-coffee"
+          ],
+          "hotspots": [
+            {
+              "handle": "house-blend-coffee",
+              "start": 1.5,
+              "end": 10,
+              "x": 52,
+              "y": 58
+            }
+          ]
+        },
+        {
+          "id": "v2",
+          "title": "Chocolate croissant, dipped",
+          "src": "/media/choco-croissant.mp4",
+          "poster": "/media/choco-croissant.jpg",
+          "productHandles": [
+            "chocolate-croissant"
+          ],
+          "hotspots": [
+            {
+              "handle": "chocolate-croissant",
+              "start": 0.8,
+              "end": 6.8,
+              "x": 50,
+              "y": 45
+            }
+          ]
+        },
+        {
+          "id": "v3",
+          "title": "Inside our pastry case",
+          "src": "/media/pastry-case.mp4",
+          "poster": "/media/pastry-case.jpg",
+          "productHandles": [
+            "weekend-pastry-box",
+            "chocolate-croissant"
+          ],
+          "hotspots": [
+            {
+              "handle": "chocolate-croissant",
+              "start": 1,
+              "end": 9,
+              "x": 33,
+              "y": 48
+            },
+            {
+              "handle": "weekend-pastry-box",
+              "start": 3,
+              "end": 10,
+              "x": 62,
+              "y": 76
+            }
+          ]
+        },
+        {
+          "id": "v4",
+          "title": "Shaping flatbreads by hand",
+          "src": "/media/dough-roll.mp4",
+          "poster": "/media/dough-roll.jpg",
+          "productHandles": [
+            "rustic-flatbreads"
+          ],
+          "hotspots": [
+            {
+              "handle": "rustic-flatbreads",
+              "start": 2,
+              "end": 11,
+              "x": 57,
+              "y": 58
+            }
+          ]
+        },
+        {
+          "id": "v5",
+          "title": "Live: sourdough Saturday",
+          "src": "/media/sourdough-knead.mp4",
+          "poster": "/media/sourdough-knead.jpg",
+          "productHandles": [
+            "country-sourdough"
+          ],
+          "liveId": "bakery-live",
+          "hotspots": [
+            {
+              "handle": "country-sourdough",
+              "start": 1.5,
+              "end": 11,
+              "x": 47,
+              "y": 26
+            }
+          ]
+        }
+      ],
+      "layout": "floating"
     }
   },
   "lives": {
@@ -105,7 +404,8 @@
           "id": "flat",
           "label": "Flatbreads"
         }
-      ]
+      ],
+      "status": "live"
     }
   }
 }

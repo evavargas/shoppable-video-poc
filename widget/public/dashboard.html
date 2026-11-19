@@ -35,10 +35,10 @@
 
     <script>
       // One block per embedding. Add ids here as new embeddings appear.
-      const EMBEDDINGS = ['demo-bakery', 'home-carousel'];
+      const EMBEDDINGS = ['demo-bakery', 'demo-stories', 'demo-live', 'home-carousel'];
       const REFRESH_MS = 5000;
 
-      const KNOWN = ['views', 'clicks', 'addToCarts', 'addToCartValue', 'currency'];
+      const KNOWN = ['views', 'clicks', 'storyOpens', 'addToCarts', 'addToCartValue', 'currency'];
       const pct = (a, b) => (b > 0 ? `${((a / b) * 100).toFixed(1)}%` : '–');
       const num = (n) => new Intl.NumberFormat().format(n);
       const money = (v, cur) => new Intl.NumberFormat(undefined, { style: 'currency', currency: cur || 'USD' }).format(v);
@@ -49,16 +49,17 @@
 
       function render(s) {
         // Any numeric field we don't know yet (new event types) still shows up, so the page keeps up with the backend.
+        const opens = s.clicks + (s.storyOpens || 0); // carousel clicks and story opens are both "opened"
         const extra = Object.keys(s).filter((k) => !KNOWN.includes(k) && typeof s[k] === 'number');
         return `
           <h2>${s.embeddingId}</h2>
           <div class="cards">
             ${card('Views', num(s.views), 'videos seen playing')}
-            ${card('Clicks', num(s.clicks), 'videos opened')}
+            ${card('Opens', num(opens), 'videos or stories opened')}
             ${card('Add to carts', num(s.addToCarts), 'from the player')}
             ${card('Cart value', money(s.addToCartValue, s.currency), 'attributed to video', true)}
-            ${card('CTR', pct(s.clicks, s.views), 'clicks / views')}
-            ${card('Add-to-cart rate', pct(s.addToCarts, s.clicks), 'add to carts / clicks')}
+            ${card('CTR', pct(opens, s.views), 'opens / views')}
+            ${card('Add-to-cart rate', pct(s.addToCarts, opens), 'add to carts / opens')}
             ${extra.map((k) => card(label(k), num(s[k]))).join('')}
           </div>`;
       }

@@ -1,8 +1,10 @@
-import { type KeyboardEvent, type TouchEvent, useEffect, useRef, useState } from 'react';
+import { type KeyboardEvent, type TouchEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { formatPrice, prefersReducedMotion } from '../format';
 import { root } from '../shopify';
-import type { LiveApi, Product, Store, Video } from '../types';
+import type { Layout, LiveApi, Product, Store, Video } from '../types';
+import { HotspotLayer } from './Hotspots';
 import { Live } from './Live';
+import { StoryProgress } from './StoryProgress';
 
 type Status = 'idle' | 'adding' | 'added' | 'error';
 
@@ -79,21 +81,51 @@ function ProductList({ video, store, onAdded }: { video: Video; store: Store; on
   );
 }
 
+/** The product card opened by tapping a hotspot, floating over the video. */
+function Sheet({ handle, store, onClose, onAdded }: { handle: string; store: Store; onClose: () => void; onAdded: (p: Product) => void }) {
+  const [product, setProduct] = useState<Product>();
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    let off = false;
+    store.getProduct(handle).then((p) => !off && setProduct(p)).catch(() => !off && onClose());
+    return () => {
+      off = true;
+    };
+  }, [handle, store, onClose]);
+
+  useEffect(() => ref.current?.focus(), [product]); // move focus into the card for keyboard and screen reader users
+
+  if (!product) return null;
+  return (
+    <div className="sheet" role="region" aria-label={`${product.title} details`} tabIndex={-1} ref={ref} onTouchStart={(e) => e.stopPropagation()}>
+      <button type="button" className="sheet-close" aria-label="Close product" onClick={onClose}>
+        ✕
+      </button>
+      <ProductCard product={product} store={store} onAdded={onAdded} />
+    </div>
+  );
+}
+
 interface PlayerProps {
+  layout: Layout;
   videos: Video[];
   startIndex: number;
   store: Store;
   connectLive: () => Promise<LiveApi>;
   onOpenVideo: (video: Video) => void; // a different video was opened by swiping or keys
   onAdded: (video: Video, product: Product) => void;
+  onHotspot: (video: Video, handle: string) => void;
   onClose: () => void;
 }
 
 const SWIPE_MIN_PX = 60;
 
-export function Player({ videos, startIndex, store, connectLive, onOpenVideo, onAdded, onClose }: PlayerProps) {
+export function Player({ layout, videos, startIndex, store, connectLive, onOpenVideo, onAdded, onHotspot, onClose }: PlayerProps) {
   const dialog = useRef<HTMLDialogElement>(null);
   const touch = useRef<{ x: number; y: number } | null>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [selected, setSelected] = useState<string | null>(null); // handle of the product opened from a hotspot
   const [index, setIndex] = useState(startIndex);
   const [dir, setDir] = useState<'next' | 'prev' | 'none'>('none');
   const [closing, setClosing] = useState(false);
@@ -107,12 +139,30 @@ export function Player({ videos, startIndex, store, connectLive, onOpenVideo, on
     else d.setAttribute('open', '');
   }, []);
 
+  const closeSheet = useCallback(() => {
+    setSelected(null);
+    videoRef.current?.play()?.catch(() => {}); // resume what we paused
+  }, []);
+
+  function openHotspot(handle: string) {
+    videoRef.current?.pause(); // so the shopper can read the card
+    setSelected(handle);
+    onHotspot(video, handle);
+  }
+
   function go(delta: number) {
     const next = videos[index + delta];
     if (!next) return;
+    setSelected(null);
     setDir(delta > 0 ? 'next' : 'prev');
     setIndex(index + delta);
     onOpenVideo(next);
+  }
+
+  // Stories play once and move on by themselves; the last one closes the player.
+  function onEnded() {
+    if (index < videos.length - 1) go(1);
+    else requestClose();
   }
 
   function requestClose() {
@@ -152,16 +202,28 @@ export function Player({ videos, startIndex, store, connectLive, onOpenVideo, on
       aria-label={video.title}
       onClose={onClose}
       onCancel={(e) => {
-        e.preventDefault(); // Esc: run our exit animation instead of closing instantly
-        requestClose();
+        e.preventDefault(); // Esc: close the product card first, then the player, with our exit animation
+        if (selected) closeSheet();
+        else requestClose();
       }}
       onKeyDown={onKeyDown}
     >
       <button type="button" className="close" aria-label="Close video" onClick={requestClose}>
         ✕
       </button>
-      <div className="stage" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
-        <video key={video.id} className={`clip ${dir}`} src={video.src} poster={video.poster} autoPlay muted loop playsInline controls />
+      <div className={`stage${layout === 'stories' ? ' story-mode' : ''}`} onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
+        <video ref={videoRef} key={`video-${video.id}`} className={`clip ${dir}`} src={video.src} poster={video.poster} autoPlay muted playsInline controls loop={layout !== 'stories'} onEnded={layout === 'stories' ? onEnded : undefined} />
+        {layout === 'stories' && <StoryProgress key={`progress-${video.id}`} count={videos.length} index={index} videoRef={videoRef} />}
+        <HotspotLayer key={`hotspots-${video.id}`} hotspots={video.hotspots ?? []} videoRef={videoRef} store={store} onOpen={openHotspot} />
+        {selected && (
+          <Sheet
+            key={selected}
+            handle={selected}
+            store={store}
+            onClose={closeSheet}
+            onAdded={(p) => onAdded(video, p)}
+          />
+        )}
         {videos.length > 1 && (
           <div className="nav">
             <button type="button" aria-label="Previous video" disabled={index === 0} onClick={() => go(-1)}>
@@ -176,7 +238,8 @@ export function Player({ videos, startIndex, store, connectLive, onOpenVideo, on
           {video.title} · {index + 1}/{videos.length}
         </p>
       </div>
-      {video.liveId && <Live key={video.liveId} liveId={video.liveId} connect={connectLive} />}
+      {/* Sibling keys must be unique: two siblings sharing a key leave stale DOM nodes behind. */}
+      {video.liveId && <Live key={`live-${video.liveId}`} liveId={video.liveId} connect={connectLive} />}
       <div className="products">
         <ProductList key={video.id} video={video} store={store} onAdded={(p) => onAdded(video, p)} />
       </div>

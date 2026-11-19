@@ -1,4 +1,4 @@
-export const EVENT_TYPES = ['view', 'video_click', 'add_to_cart'] as const;
+export const EVENT_TYPES = ['view', 'video_click', 'story_open', 'hotspot_click', 'add_to_cart'] as const;
 export type EventType = (typeof EVENT_TYPES)[number];
 
 export interface TrackEvent {
@@ -6,8 +6,9 @@ export interface TrackEvent {
   embeddingId: string;
   videoId: string;
   sessionId: string;
-  // add_to_cart only
+  // hotspot_click and add_to_cart
   productHandle?: string;
+  // add_to_cart only
   value?: number;
   currency?: string;
 }
@@ -29,18 +30,21 @@ export function parseEvent(raw: unknown): TrackEvent | null {
   if (![embeddingId, videoId, sessionId].every((v) => typeof v === 'string' && ID.test(v))) return null;
 
   const base = { type: type as EventType, embeddingId: embeddingId as string, videoId: videoId as string, sessionId: sessionId as string };
-  if (base.type !== 'add_to_cart') return base;
+  if (base.type === 'view' || base.type === 'video_click' || base.type === 'story_open') return base;
 
   const { productHandle, value, currency } = r;
   if (typeof productHandle !== 'string' || !HANDLE.test(productHandle)) return null;
+  if (base.type === 'hotspot_click') return { ...base, productHandle };
   if (typeof value !== 'number' || !Number.isFinite(value) || value < 0 || value > MAX_VALUE) return null;
   if (typeof currency !== 'string' || !CURRENCY.test(currency)) return null;
   return { ...base, productHandle, value, currency };
 }
 
 /** Which counter on stats/{embeddingId} each event type bumps. */
-export const COUNTER: Record<EventType, 'views' | 'clicks' | 'addToCarts'> = {
+export const COUNTER: Record<EventType, string> = {
   view: 'views',
   video_click: 'clicks',
+  story_open: 'storyOpens',
+  hotspot_click: 'hotspotClicks',
   add_to_cart: 'addToCarts',
 };

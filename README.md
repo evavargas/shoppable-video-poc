@@ -5,6 +5,9 @@
 **Live demo:** https://terry-shop.web.app is a fictional bakery store (Hearth & Crumb) with the widget embedded.
 The page simulates a merchant's theme and its products are Shopify-shaped JSON files; the config, live chat, poll and stats are real (Firestore + Cloud Functions).
 
+> **Status:** hotspots, the stories layout and the floating live mini-player are built and tested in this repo, but the live site at `terry-shop.web.app` has not been redeployed with them yet.
+> Run the emulators to see everything. What is done, what is planned next (features 4 to 7) and the deploy checklist are in [`docs/ROADMAP.md`](docs/ROADMAP.md).
+
 | Demo page | What it shows |
 |---|---|
 | [`/`](https://terry-shop.web.app/) | The store: "Watch & shop" carousel, product grid, cart count that reacts to the widget |
@@ -25,10 +28,91 @@ The page simulates a merchant's theme and its products are Shopify-shaped JSON f
 | Autoplay only what is visible | IntersectionObserver: videos get `src` when near, play at 60% visible, pause when not |
 | Full-screen player | Native `<dialog>` (focus trap, Esc), open/close animation, product card with Add to cart |
 | Swipe between videos | Swipe up/down on touch, Arrow keys, or the on-screen buttons. Each opened video is tracked as a `video_click` |
+| Floating live mini-player | `layout: "floating"`: a small player in the corner of every page while a live is on; dismissible for the session; expands into the full player (see below) |
+| Stories layout | `layout: "stories"` in the config turns the carousel into a row of round avatars; the same full-screen player opens with progress bars and auto-advance (see below) |
+| Timed product hotspots | A tappable chip on the video between `start` and `end` seconds at `x`/`y` percent; tapping opens a product card over the video (see below) |
 | Live chat + poll | Firestore listeners in a separate, lazily loaded `live.js` |
 | Cart count in the store header | After a successful add, the widget dispatches a `poc:cart-add` event (see below) |
 | Reduced motion | `prefers-reduced-motion` turns off animations and autoplay previews |
 | Resilience | Any failure (config, products, Firebase) hides the widget or the live panel; the store page keeps working |
+
+### Floating live mini-player
+
+A third layout, `"floating"`, for an embedding that is placed once on every page of the store (in the theme layout). It renders nothing inline; while a live is on it shows a small muted preview bottom-right.
+Tap it and the full player opens on the live video (with chat and poll); close the player and the mini-player comes back. The ✕ dismisses it for the rest of the browser session.
+
+```html
+<div data-source="poc" data-embedding-id="demo-live" data-layout="floating"></div>
+```
+
+The live is a Firestore document, `lives/{liveId}`, with a `status` field: `"live"`, `"scheduled"` or `"ended"`. The embedding's video that has a `liveId` is the one shown.
+To try it locally, change `status` in the Emulator UI (http://127.0.0.1:4000, Firestore, `lives/bakery-live`): the mini-player disappears and comes back in real time.
+
+**Staying cheap and lazy.** The mini-player is on every page, so what it costs when nothing is happening matters most:
+
+1. **Dismissed this session:** it does nothing at all. No request, no Firebase.
+2. **Otherwise:** one tiny request, `GET /api/liveStatus?id=…` (a Cloud Function that returns `{ "status": "live" }`, cached 5 s at the browser and CDN). If no live is on, it stops there.
+3. **Only when a live is on:** it loads `live.js` (the Firebase SDK) and opens one real-time listener on `lives/{liveId}`, so it disappears when the host ends the live and returns if the host restarts it.
+
+Why not just open the listener? A Firestore listener holds a connection and bills a read per change. Multiplied by every visitor on every page, that is real money for something that is usually off.
+The trade-off: the check is a snapshot, so a live that starts while the page is already open won't show until the next page load (or a 5 s-cached re-check, which I did not add). A production version would poll `liveStatus` every 30-60 s or push the state over a single shared connection.
+
+The host div has `data-layout="floating"` and no height, and `:host` drops `contain: layout` for it, because layout containment would make the host the containing block of the `position: fixed` mini-player and pin it inside the tiny host instead of the viewport.
+
+![Mini-player on the store page](docs/mini-player.png)
+
+### Stories layout (Instagram-style Timeline)
+
+The same embedding mechanism, a different `layout` in the Firestore document:
+
+```json
+{ "layout": "stories", "theme": { "accent": "#9a3412" },
+  "videos": [ { "id": "v1", "label": "Pour-over", "title": "Pour-over, the slow way", "poster": "/media/coffee-pour.jpg", "src": "...", "productHandles": ["..."] } ] }
+```
+
+- **Avatars:** round, ringed in the accent colour, from the poster image (no video is downloaded until a story is opened). `label` is the short name under the circle (falls back to `title`). A live story gets a red LIVE badge.
+- **Seen state:** opened stories turn grey for the rest of the browser session (`sessionStorage`, guarded: blocked storage just means no memory).
+- **Player:** the same component as the carousel, plus segmented progress bars. Stories play once (`loop` off); when one ends the next starts, and the last one closes the player. Hotspots, live chat and Add to cart all work inside stories.
+- **No layout shift:** the layout is only known after the config loads, so the merchant's div says it up front: `data-layout="stories"` with an inline `min-height: 104px`. The loading skeleton and `:host` height then match the final row. Without the hint the widget assumes the carousel, and a stories embedding would grow once when its config arrives.
+- **Tracking:** opening a story is `story_open` (not `video_click`); the dashboard's "Opens" card adds both, so CTR is comparable between layouts.
+
+```html
+<div data-source="poc" data-embedding-id="demo-stories" data-layout="stories" style="min-height: 104px"></div>
+```
+
+![Stories bar at the top of the store page](docs/stories-bar.png)
+![Story player with progress bars](docs/player-stories.png)
+
+### Timed product hotspots ("shop the look" on video)
+
+Each video can list hotspots. A hotspot points at one of the video's `productHandles` and says when and where to show a chip:
+
+```json
+{
+  "id": "v3",
+  "src": "/media/pastry-case.mp4",
+  "productHandles": ["weekend-pastry-box", "chocolate-croissant"],
+  "hotspots": [
+    { "handle": "chocolate-croissant", "start": 1, "end": 9,  "x": 33, "y": 48 },
+    { "handle": "weekend-pastry-box",  "start": 3, "end": 10, "x": 62, "y": 76 }
+  ]
+}
+```
+
+`x` and `y` are percentages of the frame (0 to 100), so they stay on the object at any screen size. `end` is exclusive.
+The product's title and price come from the store, never from the config.
+
+How it works: the `HotspotLayer` listens to the video's `timeupdate` event (about 4 times a second) and keeps the current time in its own state,
+so the player and the chat don't re-render. Tapping a chip pauses the video, opens the product card, and sends a `hotspot_click` event;
+closing the card resumes playback. Esc closes the card first and the player on the next press.
+The list of products under the video stays as the keyboard and screen-reader fallback, because chips come and go with the playback.
+
+Hotspots come from the network, so `sanitizeHotspots` validates each one (known product, `start` < `end`, positions in range) and drops only the invalid ones:
+a typo in one hotspot can't remove the others or the video. Events are validated again on the server (`parseEvent`).
+
+| Player with two hotspots | Product card opened from a hotspot |
+|---|---|
+| ![Hotspots on a video](docs/player-hotspots.png) | ![Product card over the video](docs/player-hotspot-card.png) |
 
 ### One widget, many embeddings
 

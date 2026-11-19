@@ -8,6 +8,17 @@ describe('parseEvent', () => {
   it('accepts view and video_click, dropping unknown and add_to_cart-only fields', () => {
     expect(parseEvent({ ...base, evil: '<script>', value: 999 })).toEqual(base);
     expect(parseEvent({ ...base, type: 'video_click' })).toEqual({ ...base, type: 'video_click' });
+    expect(parseEvent({ ...base, type: 'story_open', productHandle: 'x' })).toEqual({ ...base, type: 'story_open' });
+  });
+
+  it('accepts hotspot_click with a product handle, and drops price fields', () => {
+    const hs = { ...base, type: 'hotspot_click', productHandle: 'tee' };
+    expect(parseEvent({ ...hs, value: 5, currency: 'USD' })).toEqual(hs);
+  });
+
+  it('rejects hotspot_click without a valid product handle', () => {
+    expect(parseEvent({ ...base, type: 'hotspot_click' })).toBeNull();
+    expect(parseEvent({ ...base, type: 'hotspot_click', productHandle: 'a b' })).toBeNull();
   });
 
   it('accepts a complete add_to_cart event', () => {
@@ -33,6 +44,12 @@ describe('parseEvent', () => {
 
 describe('COUNTER', () => {
   it('maps every event type to a stats counter', () => {
-    expect(COUNTER).toEqual({ view: 'views', video_click: 'clicks', add_to_cart: 'addToCarts' });
+    expect(COUNTER).toEqual({
+      view: 'views',
+      video_click: 'clicks',
+      story_open: 'storyOpens',
+      hotspot_click: 'hotspotClicks',
+      add_to_cart: 'addToCarts',
+    });
   });
 });
