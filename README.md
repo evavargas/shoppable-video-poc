@@ -1,5 +1,11 @@
 # Shoppable video widget (proof of concept)
 
+[![CI](https://github.com/evavargas/shoppable-video-poc/actions/workflows/ci.yml/badge.svg)](https://github.com/evavargas/shoppable-video-poc/actions/workflows/ci.yml)
+
+**Live demo:** https://terry-shop.web.app — a fake store page with mock products. The config, live chat, poll and stats are real (Firestore + Cloud Functions). The page deliberately uses hostile theme CSS to show the Shadow DOM isolation.
+
+![The widget embedded in a fake store page](docs/carousel.png)
+
 An embeddable carousel of short vertical videos for a Shopify store. Tapping a video opens a full-screen player with the tagged product and a real **Add to cart**. A "live" video also shows realtime chat and a poll. Views, clicks and add-to-carts are tracked, and one number answers "how much cart value did the videos drive?".
 
 Built to understand how a product like Terrific works technically. Not a store: no accounts, payments, admin UI or video pipeline.
