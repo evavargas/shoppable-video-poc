@@ -1,9 +1,10 @@
 <!--
   Paste into: Shopify admin > Online Store > Themes > Customize > Add section > "Custom Liquid".
-  The script is served by Firebase Hosting (terry-shop.web.app), which also serves /api/*.
+  The script is served by Firebase Hosting (merece.web.app), which also serves /api/*.
+  Pages that already embed the old address (https://terry-shop.web.app/widget.js) keep working: that site is still deployed with the same files.
 
   The inline min-height reserves the widget's space BEFORE the script loads (no layout shift).
   `async` means the script never blocks the store's own rendering.
 -->
 <div data-source="poc" data-embedding-id="home-carousel" style="min-height: 300px"></div>
-<script async src="https://terry-shop.web.app/widget.js"></script>
+<script async src="https://merece.web.app/widget.js"></script>

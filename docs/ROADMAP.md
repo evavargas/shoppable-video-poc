@@ -10,7 +10,7 @@ Last updated: 2026-11-19.
 
 | Step | Status | Notes |
 |---|---|---|
-| Base PoC (a to e): widget, Firestore config, Shopify cart, tracking, live chat + poll | Done and deployed | `terry-shop.web.app` |
+| Base PoC (a to e): widget, Firestore config, Shopify cart, tracking, live chat + poll | Done and deployed | `merece.web.app` |
 | Part 1: bakery demo store, dashboard, isolation test, Pexels media, card/player polish, cart-count event | Done and deployed | |
 | Feature 1: timed product hotspots (`hotspot_click`) | Done and deployed | |
 | Feature 2: stories layout (`story_open`, progress bars) | Done and deployed | |
@@ -25,17 +25,21 @@ Numbers at the last check: widget **75.3 KB gzip** (`widget.js`), `live.js` 143.
 
 ### Deploy status and checklist
 
-Features 1 to 4 were deployed on 2026-11-19: new function `getLiveStatus`, new Firestore rules (viewers, reactions), the new demo files, and production data reseeded (`demo-bakery`, `demo-stories`, `demo-live`, `home-carousel`, `lives/bakery-live` with `status: "live"` and `pinnedProduct`). A smoke test of `https://terry-shop.web.app` showed the carousel with prices, 5 story avatars (104 px reserved), the floating mini-player and no console errors.
+Features 1 to 4 were deployed on 2026-11-19: new function `getLiveStatus`, new Firestore rules (viewers, reactions), the new demo files, and production data reseeded (`demo-bakery`, `demo-stories`, `demo-live`, `home-carousel`, `lives/bakery-live` with `status: "live"` and `pinnedProduct`). A smoke test of `https://merece.web.app` showed the carousel with prices, 5 story avatars (104 px reserved), the floating mini-player and no console errors.
 
 Repeat this for every later feature, and **confirm before running it** (it publishes to the internet and writes to the real database):
 
 0. For the Merece store: `npm run build:products` regenerates the Shopify-style product files after editing `scripts/merece-catalog.json`.
 1. `npm run build -w widget && npm run build -w functions`
-2. `npx firebase deploy --project terry-shop --force`
+2. `npx firebase deploy --project terry-shop --force`, then the same files to the legacy site: `npx firebase deploy --project terry-shop --only hosting --config firebase.legacy.json`. (`npm run deploy` does build + both.)
 3. `GOOGLE_CLOUD_QUOTA_PROJECT=terry-shop node firebase/seed.mjs --project terry-shop --file firebase/prod-data.json` (it overwrites documents with the same ids; the seed now writes `merece-demo`, `merece-stories`, `merece-live` and `home-carousel`, plus the lives `merece-live` and `bakery-live`. It does NOT delete the old `demo-bakery`, `demo-stories` and `demo-live` documents already in production: remove them from the Firebase console)
-4. Check `https://terry-shop.web.app/api/liveStatus?id=bakery-live`, the dashboard, and the store page.
+4. Check `https://merece.web.app/api/liveStatus?id=bakery-live`, the dashboard, and the store page.
 
 Note: the dashboard counters in production also include events created by smoke tests.
+
+### Addresses
+
+The public address is **https://merece.web.app** (Hosting site `merece`, created in the Firebase project `terry-shop`; the project id itself cannot be renamed). The original site `terry-shop.web.app` is kept and deployed with the same files (`firebase.legacy.json`), so anything that already embeds `https://terry-shop.web.app/widget.js` (the Shopify development store's theme) keeps working. Move such embeds to the new address when convenient; once nothing uses the old one, delete that site in the Firebase console.
 
 ## 2. How to get running again
 

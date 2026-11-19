@@ -1,0 +1,56 @@
+{
+  "hosting": {
+    "site": "terry-shop",
+    "public": "widget/dist",
+    "rewrites": [
+      {
+        "source": "/api/getEmbedConfig",
+        "function": {
+          "functionId": "getEmbedConfig",
+          "region": "southamerica-east1"
+        }
+      },
+      {
+        "source": "/api/track",
+        "function": {
+          "functionId": "track",
+          "region": "southamerica-east1"
+        }
+      },
+      {
+        "source": "/api/liveStatus",
+        "function": {
+          "functionId": "getLiveStatus",
+          "region": "southamerica-east1"
+        }
+      },
+      {
+        "source": "/api/stats",
+        "function": {
+          "functionId": "getStats",
+          "region": "southamerica-east1"
+        }
+      }
+    ],
+    "headers": [
+      {
+        "source": "/media/**",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "public, max-age=86400"
+          }
+        ]
+      },
+      {
+        "source": "/*.js",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "public, max-age=300"
+          }
+        ]
+      }
+    ]
+  }
+}

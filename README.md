@@ -2,18 +2,18 @@
 
 [![CI](https://github.com/evavargas/shoppable-video-poc/actions/workflows/ci.yml/badge.svg)](https://github.com/evavargas/shoppable-video-poc/actions/workflows/ci.yml)
 
-**Live demo:** https://terry-shop.web.app is a demo store with the widget embedded. It takes the **identity of the Merece bakery** (palette, type, pill buttons, light and dark themes, Spanish copy) and its real catalog and prices (UYU), set up as a Shopify-style storefront.
+**Live demo:** https://merece.web.app is a demo store with the widget embedded. It takes the **identity of the Merece bakery** (palette, type, pill buttons, light and dark themes, Spanish copy) and its real catalog and prices (UYU), set up as a Shopify-style storefront.
 It is a separate project from the real Merece site: nothing is synced, the real one was only read to capture the brand and the catalog. The brand and color system are documented in [`docs/BRAND.md`](docs/BRAND.md).
 The page simulates a merchant's theme and its products are Shopify-shaped JSON files (with options and variants); the config, live chat, poll and stats are real (Firestore + Cloud Functions).
 
-> **Status:** everything described below is deployed at `terry-shop.web.app`: the Merece store with its own videos, hotspots, the stories layout, the floating live mini-player and the live extras (viewer count, hearts, pinned product).
+> **Status:** everything described below is deployed at `merece.web.app`: the Merece store with its own videos, hotspots, the stories layout, the floating live mini-player and the live extras (viewer count, hearts, pinned product).
 > What is planned next (a timed coupon drop, an upcoming-live card and a host control page) and the deploy checklist are in [`docs/ROADMAP.md`](docs/ROADMAP.md).
 
 | Demo page | What it shows |
 |---|---|
-| [`/`](https://terry-shop.web.app/) | The Merece store: stories row, "Mirá y pedí" carousel, menu with options (variants), a cart drawer with delivery zones that reacts to the widget, light/dark toggle |
-| [`/dashboard.html`](https://terry-shop.web.app/dashboard.html) | Views, clicks, add-to-carts, cart value and CTR, refreshed every 5 s |
-| [`/isolation-test.html`](https://terry-shop.web.app/isolation-test.html) | The same widget on a page with deliberately hostile CSS (red serif text, hot pink buttons): proof that the Shadow DOM isolates it |
+| [`/`](https://merece.web.app/) | The Merece store: stories row, "Mirá y pedí" carousel, menu with options (variants), a cart drawer with delivery zones that reacts to the widget, light/dark toggle |
+| [`/dashboard.html`](https://merece.web.app/dashboard.html) | Views, clicks, add-to-carts, cart value and CTR, refreshed every 5 s |
+| [`/isolation-test.html`](https://merece.web.app/isolation-test.html) | The same widget on a page with deliberately hostile CSS (red serif text, hot pink buttons): proof that the Shadow DOM isolates it |
 
 | Light | Dark |
 |---|---|

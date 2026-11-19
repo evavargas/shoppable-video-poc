@@ -8,7 +8,8 @@
   "scripts": {
     "emulators": "npm run build -w widget && npm run build -w functions && firebase emulators:start --project demo-terry-poc",
     "seed": "FIRESTORE_EMULATOR_HOST=127.0.0.1:8080 node firebase/seed.mjs",
-    "build:products": "node scripts/build-merece-products.mjs"
+    "build:products": "node scripts/build-merece-products.mjs",
+    "deploy": "npm run build -w widget && npm run build -w functions && firebase deploy --project terry-shop --force && firebase deploy --project terry-shop --only hosting --config firebase.legacy.json"
   },
   "devDependencies": {
     "firebase-tools": "^15.37.0"
