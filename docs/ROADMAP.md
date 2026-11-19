@@ -9,28 +9,29 @@ Last updated: 2026-11-19.
 |---|---|---|
 | Base PoC (a to e): widget, Firestore config, Shopify cart, tracking, live chat + poll | Done and deployed | `terry-shop.web.app` |
 | Part 1: bakery demo store, dashboard, isolation test, Pexels media, card/player polish, cart-count event | Done and deployed | |
-| Feature 1: timed product hotspots (`hotspot_click`) | Done, **not deployed** | |
-| Feature 2: stories layout (`story_open`, progress bars) | Done, **not deployed** | |
-| Feature 3: floating live mini-player (`getLiveStatus`, `status` field) | Done, **not deployed** | |
-| Feature 4: live extras (viewer count, hearts, pinned product) | Done, **not deployed** | Built as planned in section 4 (see the implementation notes there) |
+| Feature 1: timed product hotspots (`hotspot_click`) | Done and deployed | |
+| Feature 2: stories layout (`story_open`, progress bars) | Done and deployed | |
+| Feature 3: floating live mini-player (`getLiveStatus`, `status` field) | Done and deployed | |
+| Feature 4: live extras (viewer count, hearts, pinned product) | Done and deployed | Built as planned in section 4 (see the implementation notes there) |
 | Feature 5: gamified discount / secret item | **Planned** (section 5), next to build | |
 | Feature 6: upcoming live (countdown, "Remind me") | Outlined (section 6) | |
 | Feature 7: host control page + auth model + rules | Outlined (section 7) | |
-| Final deploy, README screenshots for 4 to 7 | Pending | |
+| Final deploy of features 5 to 7 and README screenshots for them | Pending | |
 
 Numbers at the last check: widget **75.3 KB gzip** (`widget.js`), `live.js` 143.2 KB gzip (lazy), 73 widget tests + 35 function tests passing.
 
-### What production is missing (deploy checklist)
+### Deploy status and checklist
 
-Production (`terry-shop`) still runs the code from "Part 1". Deploying features 1 to 3 needs, in this order:
+Features 1 to 4 were deployed on 2026-11-19: new function `getLiveStatus`, new Firestore rules (viewers, reactions), the new demo files, and production data reseeded (`demo-bakery`, `demo-stories`, `demo-live`, `home-carousel`, `lives/bakery-live` with `status: "live"` and `pinnedProduct`). A smoke test of `https://terry-shop.web.app` showed the carousel with prices, 5 story avatars (104 px reserved), the floating mini-player and no console errors.
+
+Repeat this for every later feature, and **confirm before running it** (it publishes to the internet and writes to the real database):
 
 1. `npm run build -w widget && npm run build -w functions`
-2. `npx firebase deploy --project terry-shop --force` (new function `getLiveStatus`, new rewrite, new `hotspot_click`/`story_open` events, the new demo files)
-3. Re-seed production: `GOOGLE_CLOUD_QUOTA_PROJECT=terry-shop node firebase/seed.mjs --project terry-shop --file firebase/prod-data.json`
-   (adds embeddings `demo-stories`, `demo-live`, hotspots, and `status: "live"` on `lives/bakery-live`; it overwrites the existing documents with the same ids)
-4. Check `https://terry-shop.web.app/api/liveStatus?id=bakery-live` and the dashboard.
+2. `npx firebase deploy --project terry-shop --force`
+3. `GOOGLE_CLOUD_QUOTA_PROJECT=terry-shop node firebase/seed.mjs --project terry-shop --file firebase/prod-data.json` (it overwrites documents with the same ids)
+4. Check `https://terry-shop.web.app/api/liveStatus?id=bakery-live`, the dashboard, and the store page.
 
-Deploying publishes to the internet and writes to the real database, so confirm before running it.
+Note: the dashboard counters in production also include events created by smoke tests.
 
 ## 2. How to get running again
 
@@ -209,7 +210,6 @@ Goal: a tiny `/host.html`, clearly labeled **"PoC only, no real authentication"*
 - **GitHub Actions:** `actions/checkout@v4` and `actions/setup-node@v4` warn about Node 20 deprecation; bump to the current major versions.
 - **`track` is public and unthrottled:** accepts any embedding id. At scale: Pub/Sub in front, rate limits, App Check, signed embedding ids (already in the README's scale section).
 - **Pexels media in a public repo:** the license allows free use and modification but forbids redistribution on stock platforms. The files are trimmed and re-encoded and credited. If you prefer zero doubt, keep them out of git and only deploy them to Hosting.
-- **Production data:** seed data now includes `pinnedProduct` on `lives/bakery-live`; the next deploy must re-seed so production gets it, and must deploy the new Firestore rules (viewers, reactions).
 - **Real-device check:** swipe, tap targets and the native video controls were only tested with mobile emulation. Try an actual phone.
 - **Accessibility audit:** run axe on the store page, the player and the mini-player; test with VoiceOver.
 - **Performance measurement:** run Lighthouse / WebPageTest on the demo store to get real LCP and CLS numbers for the README (the layout-shift reasoning is documented, but not yet measured).

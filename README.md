@@ -5,8 +5,8 @@
 **Live demo:** https://terry-shop.web.app is a fictional bakery store (Hearth & Crumb) with the widget embedded.
 The page simulates a merchant's theme and its products are Shopify-shaped JSON files; the config, live chat, poll and stats are real (Firestore + Cloud Functions).
 
-> **Status:** hotspots, the stories layout, the floating live mini-player and the live extras (viewer count, hearts, pinned product) are built and tested in this repo, but the live site at `terry-shop.web.app` has not been redeployed with them yet.
-> Run the emulators to see everything. What is done, what is planned next (features 4 to 7) and the deploy checklist are in [`docs/ROADMAP.md`](docs/ROADMAP.md).
+> **Status:** everything described below is deployed at `terry-shop.web.app`: hotspots, the stories layout, the floating live mini-player and the live extras (viewer count, hearts, pinned product).
+> What is planned next (a timed coupon drop, an upcoming-live card and a host control page) and the deploy checklist are in [`docs/ROADMAP.md`](docs/ROADMAP.md).
 
 | Demo page | What it shows |
 |---|---|
