@@ -1,0 +1,22 @@
+{
+  "functions": [{ "source": "functions", "codebase": "default" }],
+  "firestore": { "rules": "firebase/firestore.rules" },
+  "hosting": {
+    "public": "widget/dist",
+    "rewrites": [
+      { "source": "/api/getEmbedConfig", "function": { "functionId": "getEmbedConfig", "region": "southamerica-east1" } },
+      { "source": "/api/track", "function": { "functionId": "track", "region": "southamerica-east1" } },
+      { "source": "/api/stats", "function": { "functionId": "getStats", "region": "southamerica-east1" } }
+    ],
+    "headers": [
+      { "source": "/*.js", "headers": [{ "key": "Cache-Control", "value": "public, max-age=300" }] }
+    ]
+  },
+  "emulators": {
+    "functions": { "port": 5001 },
+    "firestore": { "port": 8080 },
+    "hosting": { "port": 5002 },
+    "ui": { "enabled": true, "port": 4000 },
+    "singleProjectMode": true
+  }
+}

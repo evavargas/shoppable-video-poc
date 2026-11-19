@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Fake store page</title>
+    <style>
+      /* Aggressive "theme" CSS to prove Shadow DOM isolation */
+      body { font-family: Georgia, serif; color: #c00; margin: 0; }
+      button { background: hotpink !important; border-radius: 0 !important; }
+      ul, li { list-style: square !important; }
+      main { max-width: 900px; margin: 0 auto; padding: 24px 0; }
+      h1, p { padding: 0 16px; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Summer collection</h1>
+      <p>Store content above the widget.</p>
+      <!-- min-height is inline so space is reserved BEFORE widget.js loads: no layout shift -->
+      <div data-source="poc" data-embedding-id="home-carousel" data-store="mock" style="min-height: 300px"></div>
+      <p>Same widget, different embedding id = different config (videos and accent color from Firestore).</p>
+      <div data-source="poc" data-embedding-id="pdp-carousel" data-store="mock" style="min-height: 300px"></div>
+      <p>An unknown id hides the widget and leaves no gap:</p>
+      <div data-source="poc" data-embedding-id="does-not-exist"></div>
+      <h2>Revenue attributed to video (home-carousel)</h2>
+      <pre id="stats">loading…</pre>
+      <p>End of page.</p>
+    </main>
+    <script async src="./widget.js"></script>
+    <script>
+      // Demo only: poll the stats endpoint so you can watch the numbers move.
+      const show = () =>
+        fetch('/api/stats?id=home-carousel').then((r) => r.json()).then((d) => (document.getElementById('stats').textContent = JSON.stringify(d, null, 2)));
+      show();
+      setInterval(show, 2000);
+    </script>
+  </body>
+</html>

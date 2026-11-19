@@ -1,0 +1,90 @@
+{
+  "embeds": {
+    "home-carousel": {
+      "theme": {
+        "accent": "#0b6b4f"
+      },
+      "videos": [
+        {
+          "id": "v1",
+          "title": "Linen overshirt, styled 3 ways",
+          "src": "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
+          "productHandles": [
+            "linen-overshirt"
+          ],
+          "liveId": "summer-live"
+        },
+        {
+          "id": "v2",
+          "title": "Weekend bag packing",
+          "src": "https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/360/Big_Buck_Bunny_360_10s_1MB.mp4",
+          "productHandles": [
+            "weekender-bag"
+          ]
+        },
+        {
+          "id": "v3",
+          "title": "Everyday sneakers",
+          "src": "https://test-videos.co.uk/vids/jellyfish/mp4/h264/360/Jellyfish_360_10s_1MB.mp4",
+          "productHandles": [
+            "canvas-sneakers"
+          ]
+        },
+        {
+          "id": "v4",
+          "title": "Road trip essentials",
+          "src": "https://test-videos.co.uk/vids/sintel/mp4/h264/360/Sintel_360_10s_1MB.mp4",
+          "productHandles": [
+            "road-sunglasses"
+          ]
+        },
+        {
+          "id": "v5",
+          "title": "Summer layers",
+          "src": "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
+          "productHandles": [
+            "cotton-tee"
+          ]
+        }
+      ]
+    },
+    "pdp-carousel": {
+      "theme": {
+        "accent": "#7a1f3d"
+      },
+      "videos": [
+        {
+          "id": "p1",
+          "title": "How it fits",
+          "src": "https://test-videos.co.uk/vids/jellyfish/mp4/h264/360/Jellyfish_360_10s_1MB.mp4",
+          "productHandles": [
+            "linen-overshirt"
+          ]
+        },
+        {
+          "id": "p2",
+          "title": "Unboxing",
+          "src": "https://test-videos.co.uk/vids/sintel/mp4/h264/360/Sintel_360_10s_1MB.mp4",
+          "productHandles": [
+            "linen-overshirt"
+          ]
+        }
+      ]
+    }
+  },
+  "lives": {
+    "summer-live": {
+      "question": "Which look should we restock first?",
+      "options": [
+        {
+          "id": "overshirt",
+          "label": "Linen Overshirt"
+        },
+        {
+          "id": "bag",
+          "label": "Weekender Bag"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "embeds": {
+    "home-carousel": {
+      "theme": { "accent": "#8a3b12" },
+      "videos": [
+        { "id": "v1", "title": "Chocolate cake, live baking", "src": "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
+          "productHandles": ["chocolate-cake"], "liveId": "bakery-live" },
+        { "id": "v2", "title": "Lemon pie, fresh out of the oven", "src": "https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/360/Big_Buck_Bunny_360_10s_1MB.mp4",
+          "productHandles": ["lemon-pie"] },
+        { "id": "v3", "title": "Cinnamon rolls", "src": "https://test-videos.co.uk/vids/jellyfish/mp4/h264/360/Jellyfish_360_10s_1MB.mp4",
+          "productHandles": ["rolls-de-canela"] }
+      ]
+    }
+  },
+  "lives": {
+    "bakery-live": {
+      "question": "What should we bake next?",
+      "options": [
+        { "id": "cake", "label": "Chocolate cake" },
+        { "id": "pie", "label": "Lemon pie" },
+        { "id": "rolls", "label": "Cinnamon rolls" }
+      ]
+    }
+  }
+}

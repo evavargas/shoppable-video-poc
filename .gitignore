@@ -1,0 +1,9 @@
+node_modules
+dist
+lib
+*-debug.log
+.firebase
+.impeccable
+functions/.env
+functions/.env.*
+!functions/.env.example
