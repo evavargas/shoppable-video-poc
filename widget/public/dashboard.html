@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Video analytics</title>
+    <style>
+      :root { --bg: #f1f3f5; --ink: #1b1f24; --muted: #5b636d; --line: #dde1e6; --card: #fff; --accent: #9a3412; --good: #2f6f3e; }
+      * { box-sizing: border-box; }
+      body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+      main { max-width: 1000px; margin: 0 auto; padding: 24px 16px 48px; }
+      header { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px; margin-bottom: 20px; }
+      h1 { margin: 0; font-size: 26px; }
+      .meta { color: var(--muted); font-size: 14px; }
+      a { color: var(--accent); }
+      h2 { margin: 28px 0 12px; font-size: 14px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+      .cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+      .card { padding: 16px; background: var(--card); border: 1px solid var(--line); border-radius: 14px; }
+      .card .label { color: var(--muted); font-size: 13px; }
+      .card .value { margin-top: 4px; font-size: 30px; font-weight: 700; font-variant-numeric: tabular-nums; }
+      .card .hint { margin-top: 2px; color: var(--muted); font-size: 12px; }
+      .card.key .value { color: var(--good); }
+      .error { padding: 12px 16px; border: 1px solid #e5b4a8; border-radius: 12px; background: #fdf0ec; color: #7a2a14; }
+      @media (min-width: 720px) { .cards { grid-template-columns: repeat(3, 1fr); } h1 { font-size: 30px; } }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <h1>Video analytics</h1>
+        <span class="meta"><span id="updated">Loading…</span> · <a href="/">Back to the demo store</a></span>
+      </header>
+      <div id="out" aria-live="off"></div>
+    </main>
+
+    <script>
+      // One block per embedding. Add ids here as new embeddings appear.
+      const EMBEDDINGS = ['demo-bakery', 'home-carousel'];
+      const REFRESH_MS = 5000;
+
+      const KNOWN = ['views', 'clicks', 'addToCarts', 'addToCartValue', 'currency'];
+      const pct = (a, b) => (b > 0 ? `${((a / b) * 100).toFixed(1)}%` : '–');
+      const num = (n) => new Intl.NumberFormat().format(n);
+      const money = (v, cur) => new Intl.NumberFormat(undefined, { style: 'currency', currency: cur || 'USD' }).format(v);
+      const label = (k) => k.replace(/([A-Z])/g, ' $1').replace(/_/g, ' ').replace(/^./, (c) => c.toUpperCase());
+
+      const card = (name, value, hint, key) =>
+        `<div class="card${key ? ' key' : ''}"><div class="label">${name}</div><div class="value">${value}</div>${hint ? `<div class="hint">${hint}</div>` : ''}</div>`;
+
+      function render(s) {
+        // Any numeric field we don't know yet (new event types) still shows up, so the page keeps up with the backend.
+        const extra = Object.keys(s).filter((k) => !KNOWN.includes(k) && typeof s[k] === 'number');
+        return `
+          <h2>${s.embeddingId}</h2>
+          <div class="cards">
+            ${card('Views', num(s.views), 'videos seen playing')}
+            ${card('Clicks', num(s.clicks), 'videos opened')}
+            ${card('Add to carts', num(s.addToCarts), 'from the player')}
+            ${card('Cart value', money(s.addToCartValue, s.currency), 'attributed to video', true)}
+            ${card('CTR', pct(s.clicks, s.views), 'clicks / views')}
+            ${card('Add-to-cart rate', pct(s.addToCarts, s.clicks), 'add to carts / clicks')}
+            ${extra.map((k) => card(label(k), num(s[k]))).join('')}
+          </div>`;
+      }
+
+      async function refresh() {
+        const out = document.getElementById('out');
+        try {
+          const all = await Promise.all(EMBEDDINGS.map((id) => fetch(`/api/stats?id=${encodeURIComponent(id)}`).then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); })));
+          out.innerHTML = all.map(render).join('');
+          document.getElementById('updated').textContent = `Updated ${new Date().toLocaleTimeString()}`;
+        } catch (e) {
+          out.innerHTML = '<p class="error">Could not load stats. Is the API running?</p>';
+        }
+      }
+      refresh();
+      setInterval(refresh, REFRESH_MS);
+    </script>
+  </body>
+</html>

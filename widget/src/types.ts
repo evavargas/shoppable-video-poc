@@ -12,6 +12,7 @@ export interface Product {
 export interface Video {
   id: string;
   src: string;
+  poster?: string;
   title: string;
   productHandles: string[];
   liveId?: string; // present = this video has live chat and a poll
@@ -29,6 +30,8 @@ export interface EmbedConfig {
 export interface Store {
   getProduct(handle: string): Promise<Product>;
   addToCart(product: Product): Promise<void>;
+  /** Optional: lets the host page show an accurate cart count. */
+  getCartCount?(): Promise<number | undefined>;
 }
 
 /** Public Firebase settings, delivered by the config endpoint (none of these are secrets). */

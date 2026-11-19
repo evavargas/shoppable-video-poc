@@ -1,8 +1,9 @@
-import { type CSSProperties, useCallback, useEffect, useState } from 'react';
+import { type CSSProperties, useCallback, useEffect, useMemo, useState } from 'react';
+import { emitCartAdd } from './cart-event';
 import { Carousel, CarouselSkeleton } from './components/Carousel';
 import { Player } from './components/Player';
 import type { Track } from './track';
-import type { EmbedConfig, FirebaseSettings, LiveApi, Store, Video } from './types';
+import type { EmbedConfig, FirebaseSettings, LiveApi, Product, Store } from './types';
 
 interface Props {
   embeddingId: string;
@@ -13,9 +14,27 @@ interface Props {
   connectLive: (settings: FirebaseSettings) => Promise<LiveApi>;
 }
 
+/** The carousel cards and the player ask for the same products: fetch each handle once. */
+function memoizeStore(store: Store): Store {
+  const cache = new Map<string, Promise<Product>>();
+  return {
+    ...store,
+    getProduct(handle) {
+      let p = cache.get(handle);
+      if (!p) {
+        p = store.getProduct(handle);
+        p.catch(() => cache.delete(handle)); // don't cache failures
+        cache.set(handle, p);
+      }
+      return p;
+    },
+  };
+}
+
 export function App({ embeddingId, onFail, loadConfig, store, track, connectLive }: Props) {
   const [config, setConfig] = useState<EmbedConfig | null>(null);
-  const [open, setOpen] = useState<Video | null>(null);
+  const [open, setOpen] = useState<number | null>(null);
+  const cachedStore = useMemo(() => memoizeStore(store), [store]);
 
   useEffect(() => {
     let cancelled = false;
@@ -44,20 +63,24 @@ export function App({ embeddingId, onFail, loadConfig, store, track, connectLive
     <div style={{ '--accent': config.theme.accent } as CSSProperties}>
       <Carousel
         videos={config.videos}
+        store={cachedStore}
         onView={(v) => track({ type: 'view', videoId: v.id })}
-        onOpen={(v) => {
-          track({ type: 'video_click', videoId: v.id });
-          setOpen(v);
+        onOpen={(i) => {
+          track({ type: 'video_click', videoId: config.videos[i]?.id ?? '' });
+          setOpen(i);
         }}
       />
-      {open && (
+      {open !== null && (
         <Player
-          video={open}
-          store={store}
+          videos={config.videos}
+          startIndex={open}
+          store={cachedStore}
           connectLive={connect}
-          onAdded={(p) =>
-            track({ type: 'add_to_cart', videoId: open.id, productHandle: p.handle, value: p.price, currency: p.currency })
-          }
+          onOpenVideo={(v) => track({ type: 'video_click', videoId: v.id })}
+          onAdded={(v, p) => {
+            track({ type: 'add_to_cart', videoId: v.id, productHandle: p.handle, value: p.price, currency: p.currency });
+            void emitCartAdd(p, cachedStore);
+          }}
           onClose={() => setOpen(null)}
         />
       )}

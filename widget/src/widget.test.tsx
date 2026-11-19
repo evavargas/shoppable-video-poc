@@ -1,4 +1,4 @@
-import { act, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { App } from './App';
 import { Carousel } from './components/Carousel';
@@ -11,11 +11,19 @@ const product: Product = { handle: 'tee', title: 'Cotton Tee', price: 29, curren
 const makeStore = (p: Product = product): Store => ({
   getProduct: vi.fn().mockResolvedValue(p),
   addToCart: vi.fn().mockResolvedValue(undefined),
+  getCartCount: vi.fn().mockResolvedValue(3),
 });
 const config: EmbedConfig = {
   embeddingId: 't',
   theme: { accent: '#0b6b4f' },
   videos: [{ id: 'v1', src: 'https://x.test/v1.mp4', title: 'Summer layers', productHandles: ['tee'] }],
+};
+const twoVideos: EmbedConfig = {
+  ...config,
+  videos: [
+    { id: 'v1', src: 'https://x.test/v1.mp4', title: 'Summer layers', productHandles: ['tee'] },
+    { id: 'v2', src: 'https://x.test/v2.mp4', title: 'Winter coats', productHandles: ['tee'] },
+  ],
 };
 
 const track = vi.fn();
@@ -27,7 +35,7 @@ describe('Carousel performance behaviour', () => {
   const onView = vi.fn();
 
   it('counts one view per video, only once it plays', () => {
-    render(<Carousel videos={config.videos} onOpen={() => {}} onView={onView} />);
+    render(<Carousel videos={config.videos} store={makeStore()} onOpen={() => {}} onView={onView} />);
     const card = screen.getByRole('button', { name: /summer layers/i });
     intersect(card, 0.3);
     expect(onView).not.toHaveBeenCalled();
@@ -38,7 +46,7 @@ describe('Carousel performance behaviour', () => {
   });
 
   it('sets video src only when near the viewport, plays only when mostly visible', () => {
-    render(<Carousel videos={config.videos} onOpen={() => {}} onView={onView} />);
+    render(<Carousel videos={config.videos} store={makeStore()} onOpen={() => {}} onView={onView} />);
     const video = document.querySelector('video')!;
     const card = screen.getByRole('button', { name: /summer layers/i });
 
@@ -53,6 +61,85 @@ describe('Carousel performance behaviour', () => {
 
     intersect(card, 0); // scrolled away
     expect(video.pause).toHaveBeenCalled();
+  });
+});
+
+describe('Carousel card', () => {
+  const rich: EmbedConfig['videos'] = [
+    { id: 'v1', src: 'https://x.test/v1.mp4', poster: 'https://x.test/v1.jpg', title: 'Summer layers', productHandles: ['tee'], liveId: 'l1' },
+  ];
+
+  it('shows the poster, the product price (from the store) and a LIVE badge', async () => {
+    render(<Carousel videos={rich} store={makeStore()} onOpen={() => {}} onView={() => {}} />);
+    expect(document.querySelector('video')).toHaveAttribute('poster', 'https://x.test/v1.jpg');
+    expect(screen.getByText('LIVE')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /watch: summer layers, live/i })).toBeInTheDocument();
+
+    intersect(screen.getByRole('button'), 0.2); // price is fetched lazily, when the card is near the viewport
+    expect(await screen.findByText('$29.00')).toBeInTheDocument();
+  });
+
+  it('shows "Sold out" instead of a price when the product is unavailable', async () => {
+    render(<Carousel videos={rich} store={makeStore({ ...product, available: false })} onOpen={() => {}} onView={() => {}} />);
+    intersect(screen.getByRole('button'), 0.2);
+    expect(await screen.findByText('Sold out')).toBeInTheDocument();
+  });
+
+  it('does not autoplay previews when the user prefers reduced motion', () => {
+    Object.defineProperty(window, 'matchMedia', { value: () => ({ matches: true }), configurable: true });
+    try {
+      render(<Carousel videos={rich} store={makeStore()} onOpen={() => {}} onView={() => {}} />);
+      intersect(screen.getByRole('button'), 0.9);
+      expect(document.querySelector('video')!.play).not.toHaveBeenCalled();
+    } finally {
+      delete (window as { matchMedia?: unknown }).matchMedia; // jsdom has none by default
+    }
+  });
+});
+
+describe('Player', () => {
+  const openPlayer = async (store = makeStore()) => {
+    render(<App embeddingId="t" loadConfig={async () => twoVideos} store={store} track={track} connectLive={connectLive} onFail={() => {}} />);
+    await userEvent.click(await screen.findByRole('button', { name: /watch: summer layers/i }));
+    await screen.findByRole('dialog');
+  };
+  const counter = () => document.querySelector('.counter')!.textContent;
+
+  it('moves between videos with buttons, arrow keys and swipes, tracking each opened video', async () => {
+    await openPlayer();
+    expect(counter()).toContain('1/2');
+    expect(screen.getByRole('button', { name: 'Previous video' })).toBeDisabled();
+
+    await userEvent.click(screen.getByRole('button', { name: 'Next video' }));
+    expect(counter()).toContain('Winter coats · 2/2');
+    expect(track).toHaveBeenCalledWith({ type: 'video_click', videoId: 'v2' });
+    expect(screen.getByRole('button', { name: 'Next video' })).toBeDisabled();
+
+    fireEvent.keyDown(screen.getByRole('dialog'), { key: 'ArrowUp' });
+    expect(counter()).toContain('1/2');
+
+    const stage = document.querySelector('.stage')!;
+    fireEvent.touchStart(stage, { touches: [{ clientX: 100, clientY: 400 }] });
+    fireEvent.touchEnd(stage, { changedTouches: [{ clientX: 105, clientY: 250 }] }); // swipe up
+    expect(counter()).toContain('2/2');
+
+    fireEvent.touchStart(stage, { touches: [{ clientX: 100, clientY: 300 }] });
+    fireEvent.touchEnd(stage, { changedTouches: [{ clientX: 220, clientY: 330 }] }); // short, mostly sideways: ignored
+    expect(counter()).toContain('2/2');
+  });
+
+  it('tells the host page the cart changed, with the real count from the store', async () => {
+    const heard = vi.fn();
+    window.addEventListener('poc:cart-add', (e) => heard((e as CustomEvent).detail));
+    await openPlayer();
+    await userEvent.click(await screen.findByRole('button', { name: /add to cart/i }));
+    await vi.waitFor(() => expect(heard).toHaveBeenCalledWith(expect.objectContaining({ handle: 'tee', count: 3 })));
+  });
+
+  it('closes with the close button after the exit animation', async () => {
+    await openPlayer();
+    await userEvent.click(screen.getByRole('button', { name: 'Close video' }));
+    await vi.waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
   });
 });
 

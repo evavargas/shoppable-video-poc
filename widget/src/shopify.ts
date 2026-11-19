@@ -51,4 +51,9 @@ export const shopifyStore: Store = {
       throw new Error(body?.description ?? `cart/add failed: ${res.status}`);
     }
   },
+
+  async getCartCount() {
+    const res = await fetch(`${root()}cart.js`);
+    return res.ok ? ((await res.json()) as { item_count?: number }).item_count : undefined;
+  },
 };

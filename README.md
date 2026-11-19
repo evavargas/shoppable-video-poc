@@ -2,9 +2,63 @@
 
 [![CI](https://github.com/evavargas/shoppable-video-poc/actions/workflows/ci.yml/badge.svg)](https://github.com/evavargas/shoppable-video-poc/actions/workflows/ci.yml)
 
-**Live demo:** https://terry-shop.web.app — a fake store page with mock products. The config, live chat, poll and stats are real (Firestore + Cloud Functions). The page deliberately uses hostile theme CSS to show the Shadow DOM isolation.
+**Live demo:** https://terry-shop.web.app is a fictional bakery store (Hearth & Crumb) with the widget embedded.
+The page simulates a merchant's theme and its products are Shopify-shaped JSON files; the config, live chat, poll and stats are real (Firestore + Cloud Functions).
 
-![The widget embedded in a fake store page](docs/carousel.png)
+| Demo page | What it shows |
+|---|---|
+| [`/`](https://terry-shop.web.app/) | The store: "Watch & shop" carousel, product grid, cart count that reacts to the widget |
+| [`/dashboard.html`](https://terry-shop.web.app/dashboard.html) | Views, clicks, add-to-carts, cart value and CTR, refreshed every 5 s |
+| [`/isolation-test.html`](https://terry-shop.web.app/isolation-test.html) | The same widget on a page with deliberately hostile CSS (red serif text, hot pink buttons): proof that the Shadow DOM isolates it |
+
+| Store page (desktop) | Store page (mobile) | Live video in the player |
+|---|---|---|
+| ![Store page on desktop](docs/store-desktop.png) | ![Store page on mobile](docs/store-mobile.png) | ![Player on a live video](docs/player-live.png) |
+
+![Analytics dashboard](docs/dashboard.png)
+
+## What the widget does
+
+| Feature | How |
+|---|---|
+| Carousel with posters, price and LIVE badge | Poster first; the price is read from the store (`/products/{handle}.js`) only when a card is near the viewport; live videos get a pulsing badge |
+| Autoplay only what is visible | IntersectionObserver: videos get `src` when near, play at 60% visible, pause when not |
+| Full-screen player | Native `<dialog>` (focus trap, Esc), open/close animation, product card with Add to cart |
+| Swipe between videos | Swipe up/down on touch, Arrow keys, or the on-screen buttons. Each opened video is tracked as a `video_click` |
+| Live chat + poll | Firestore listeners in a separate, lazily loaded `live.js` |
+| Cart count in the store header | After a successful add, the widget dispatches a `poc:cart-add` event (see below) |
+| Reduced motion | `prefers-reduced-motion` turns off animations and autoplay previews |
+| Resilience | Any failure (config, products, Firebase) hides the widget or the live panel; the store page keeps working |
+
+### One widget, many embeddings
+
+Each embedding id is a Firestore document, so the same `widget.js` serves different stores. This repo seeds two:
+`demo-bakery` (the fictional store above, with Shopify-shaped mock products) and `home-carousel` (a real Shopify development store).
+Adding a client is adding a document; no build or deploy.
+
+### Updating the store's cart count
+
+A widget can't know how a theme draws its cart, so after a successful `/cart/add.js` it dispatches a DOM event on `window`:
+
+```js
+window.addEventListener('poc:cart-add', (e) => {
+  // e.detail = { handle, title, price, currency, count }  (count = Shopify's cart item_count when available)
+});
+```
+
+The demo page listens and updates its header badge. On a real Shopify theme the listener would use the **Section Rendering API**:
+`fetch(`${Shopify.routes.root}?sections=cart-icon-bubble`)` returns the HTML of the theme's own cart-count section already rendered by Liquid,
+and the listener swaps it into the header. That keeps the markup, translations and styling owned by the theme.
+
+### Media credits
+
+Videos and product photos are frames and clips from [Pexels](https://www.pexels.com/) creators, used under the [Pexels License](https://www.pexels.com/license/) (free to use and modify, attribution not required but given):
+Michael Burrows ([coffee pour](https://www.pexels.com/video/pouring-black-coffee-into-a-cup-7118100/)),
+Anna Tarazevich ([croissant](https://www.pexels.com/video/a-person-dipping-a-croissant-on-chocolate-6741736/)),
+Uriel Mont ([pastry case](https://www.pexels.com/video/a-low-angle-shot-of-a-pastry-shop-6307657/)),
+Eva Bronzini ([flatbreads](https://www.pexels.com/video/a-person-shaping-the-dough-using-rolling-pin-7237140/)),
+Pavel Danilyuk ([kneading](https://www.pexels.com/video/a-person-kneading-dough-6942821/)).
+They are trimmed to 12 s, re-encoded to 720p H.264 and stripped of audio. These files are not covered by this repository's code license. The brand, products and prices are fictional.
 
 An embeddable carousel of short vertical videos for a Shopify store. Tapping a video opens a full-screen player with the tagged product and a real **Add to cart**. A "live" video also shows realtime chat and a poll. Views, clicks and add-to-carts are tracked, and one number answers "how much cart value did the videos drive?".
 
@@ -78,7 +132,7 @@ flowchart LR
 
 | File | Size | Loaded |
 |---|---|---|
-| `widget.js` | ~70 KB (React + ReactDOM are most of it) | Always |
+| `widget.js` | ~72 KB (React + ReactDOM are most of it) | Always |
 | `live.js` | ~143 KB (Firebase Firestore SDK) | Only when a live video opens |
 
 `npm run build -w widget` prints the current numbers.
@@ -91,11 +145,11 @@ flowchart LR
 - **One vote per session id, not per person.** Votes are create-only docs keyed by a random per-page-load id. A new page load can vote again. Real prevention needs authentication.
 - **Poll tallied in the client** by reading the votes subcollection. Fine for hundreds of voters, wasteful for thousands.
 - **First available variant only.** No variant picker, no quantity, no multi-currency stats.
-- **Theme cart UI isn't refreshed.** `/cart/add.js` changes the cart, but the theme's cart count or drawer doesn't update. Real apps use the Section Rendering API or theme-specific events.
+- **The theme's cart UI is the theme's job.** The widget only announces a cart change (`poc:cart-add`); each theme (or an app block) must listen and refresh its own cart count or drawer, ideally with the Section Rendering API.
 - **Pasted Custom Liquid vs a real app.** A production app would ship a **theme app extension** (an app embed block): merchants toggle it in the theme editor, Shopify serves the script, settings become block fields, and it survives theme changes. Pasted snippets break when the theme is replaced.
 - **Cache vs schema.** `widget.js` is cached for 5 minutes. During development an old bundle received a new config shape and crashed; the error boundary hid the widget cleanly, but it shows why config schema changes must stay backward compatible or use versioned filenames.
 - **Failure collapses the reserved space.** On error the host is hidden, so content below shifts up once.
-- **Video** is plain `<video>` with MP4. No adaptive bitrate.
+- **Video** is plain `<video>` with a short MP4 per clip, served from Hosting. No adaptive bitrate.
 
 ## What I would do differently at scale
 
@@ -111,7 +165,8 @@ flowchart LR
 ## Project layout
 
 ```
-widget/      React + TypeScript widget (Vite library mode), tests with Vitest + Testing Library
+widget/      React + TypeScript widget (Vite library mode), tests with Vitest + Testing Library.
+             widget/public/ is the demo site: store page, dashboard, isolation test, media/ and Shopify-shaped products/*.js
 functions/   Cloud Functions (Node + TypeScript): getEmbedConfig, track, getStats, event validation + test
 firebase/    Firestore rules, seed data and script (firebase.json and .firebaserc live at the repo root: the CLI only deploys folders inside its project directory)
 shopify/     custom-liquid.html: the snippet to paste into a theme

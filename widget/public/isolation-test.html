@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Shadow DOM isolation test</title>
+    <style>
+      /* Deliberately hostile "theme" CSS. The widget must look identical to the clean store page. */
+      body { font-family: Georgia, serif; color: #c00; margin: 0; }
+      button { background: hotpink !important; border-radius: 0 !important; font-size: 28px !important; }
+      ul, li { list-style: square !important; }
+      a { color: #c00; }
+      main { max-width: 900px; margin: 0 auto; padding: 24px 0; }
+      h1, p { padding: 0 16px; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Shadow DOM isolation test</h1>
+      <p>
+        This page has deliberately hostile theme CSS: red serif text, hot pink square buttons, square list bullets.
+        The widget below must look exactly as it does on the <a href="/">clean demo store</a>, because the store's CSS cannot reach into its Shadow DOM.
+      </p>
+      <!-- min-height is inline so space is reserved BEFORE widget.js loads: no layout shift -->
+      <div data-source="poc" data-embedding-id="demo-bakery" data-store="mock" style="min-height: 300px"></div>
+      <p>An unknown embedding id hides the widget and leaves no gap (the next line follows directly):</p>
+      <div data-source="poc" data-embedding-id="does-not-exist" data-store="mock"></div>
+      <p>End of page.</p>
+    </main>
+    <script async src="./widget.js"></script>
+  </body>
+</html>

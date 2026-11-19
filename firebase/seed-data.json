@@ -1,88 +1,109 @@
 {
   "embeds": {
-    "home-carousel": {
+    "demo-bakery": {
       "theme": {
-        "accent": "#0b6b4f"
+        "accent": "#9a3412"
       },
       "videos": [
         {
           "id": "v1",
-          "title": "Linen overshirt, styled 3 ways",
-          "src": "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
+          "title": "Pour-over, the slow way",
+          "src": "/media/coffee-pour.mp4",
+          "poster": "/media/coffee-pour.jpg",
           "productHandles": [
-            "linen-overshirt"
-          ],
-          "liveId": "summer-live"
+            "house-blend-coffee"
+          ]
         },
         {
           "id": "v2",
-          "title": "Weekend bag packing",
-          "src": "https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/360/Big_Buck_Bunny_360_10s_1MB.mp4",
+          "title": "Chocolate croissant, dipped",
+          "src": "/media/choco-croissant.mp4",
+          "poster": "/media/choco-croissant.jpg",
           "productHandles": [
-            "weekender-bag"
+            "chocolate-croissant"
           ]
         },
         {
           "id": "v3",
-          "title": "Everyday sneakers",
-          "src": "https://test-videos.co.uk/vids/jellyfish/mp4/h264/360/Jellyfish_360_10s_1MB.mp4",
+          "title": "Inside our pastry case",
+          "src": "/media/pastry-case.mp4",
+          "poster": "/media/pastry-case.jpg",
           "productHandles": [
-            "canvas-sneakers"
+            "weekend-pastry-box"
           ]
         },
         {
           "id": "v4",
-          "title": "Road trip essentials",
-          "src": "https://test-videos.co.uk/vids/sintel/mp4/h264/360/Sintel_360_10s_1MB.mp4",
+          "title": "Shaping flatbreads by hand",
+          "src": "/media/dough-roll.mp4",
+          "poster": "/media/dough-roll.jpg",
           "productHandles": [
-            "road-sunglasses"
+            "rustic-flatbreads"
           ]
         },
         {
           "id": "v5",
-          "title": "Summer layers",
-          "src": "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
+          "title": "Live: sourdough Saturday",
+          "src": "/media/sourdough-knead.mp4",
+          "poster": "/media/sourdough-knead.jpg",
           "productHandles": [
-            "cotton-tee"
-          ]
+            "country-sourdough"
+          ],
+          "liveId": "bakery-live"
         }
       ]
     },
-    "pdp-carousel": {
+    "home-carousel": {
       "theme": {
-        "accent": "#7a1f3d"
+        "accent": "#9a3412"
       },
       "videos": [
         {
-          "id": "p1",
-          "title": "How it fits",
-          "src": "https://test-videos.co.uk/vids/jellyfish/mp4/h264/360/Jellyfish_360_10s_1MB.mp4",
+          "id": "v1",
+          "title": "Chocolate cake, live baking",
+          "src": "/media/choco-croissant.mp4",
+          "poster": "/media/choco-croissant.jpg",
           "productHandles": [
-            "linen-overshirt"
+            "chocolate-cake"
+          ],
+          "liveId": "bakery-live"
+        },
+        {
+          "id": "v2",
+          "title": "Lemon pie, fresh out of the oven",
+          "src": "/media/pastry-case.mp4",
+          "poster": "/media/pastry-case.jpg",
+          "productHandles": [
+            "lemon-pie"
           ]
         },
         {
-          "id": "p2",
-          "title": "Unboxing",
-          "src": "https://test-videos.co.uk/vids/sintel/mp4/h264/360/Sintel_360_10s_1MB.mp4",
+          "id": "v3",
+          "title": "Cinnamon rolls",
+          "src": "/media/dough-roll.mp4",
+          "poster": "/media/dough-roll.jpg",
           "productHandles": [
-            "linen-overshirt"
+            "rolls-de-canela"
           ]
         }
       ]
     }
   },
   "lives": {
-    "summer-live": {
-      "question": "Which look should we restock first?",
+    "bakery-live": {
+      "question": "What should we bake next Saturday?",
       "options": [
         {
-          "id": "overshirt",
-          "label": "Linen Overshirt"
+          "id": "croissant",
+          "label": "Chocolate croissant"
         },
         {
-          "id": "bag",
-          "label": "Weekender Bag"
+          "id": "box",
+          "label": "Pastry box"
+        },
+        {
+          "id": "flat",
+          "label": "Flatbreads"
         }
       ]
     }

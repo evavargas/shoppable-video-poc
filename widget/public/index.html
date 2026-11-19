@@ -3,37 +3,225 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Fake store page</title>
+    <title>Hearth &amp; Crumb Bakery</title>
+    <meta name="description" content="Small-batch bakery and coffee. Demo store for a shoppable video widget." />
     <style>
-      /* Aggressive "theme" CSS to prove Shadow DOM isolation */
-      body { font-family: Georgia, serif; color: #c00; margin: 0; }
-      button { background: hotpink !important; border-radius: 0 !important; }
-      ul, li { list-style: square !important; }
-      main { max-width: 900px; margin: 0 auto; padding: 24px 0; }
-      h1, p { padding: 0 16px; }
+      /* This file simulates the MERCHANT's theme. None of it is part of the widget. */
+      :root {
+        --bg: #faf5ee;
+        --ink: #2b2118;
+        --muted: #6b5d50;
+        --line: #e7dccd;
+        --accent: #9a3412;
+        --accent-ink: #fff;
+        --card: #fff;
+      }
+      * { box-sizing: border-box; }
+      body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif; }
+      h1, h2, h3, .logo { font-family: ui-serif, "Iowan Old Style", "Palatino Linotype", Georgia, serif; letter-spacing: -0.01em; }
+      a { color: inherit; }
+      img { max-width: 100%; display: block; }
+      .wrap { max-width: 1120px; margin: 0 auto; padding: 0 16px; }
+
+      .announce { background: var(--ink); color: #f5ebdd; text-align: center; font-size: 13px; padding: 8px 16px; }
+
+      header.site { background: var(--bg); border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 5; }
+      header.site .wrap { display: flex; align-items: center; justify-content: space-between; height: 64px; }
+      .logo { font-size: 22px; font-weight: 700; text-decoration: none; }
+      .logo span { color: var(--accent); }
+      nav.main { display: none; gap: 28px; font-size: 15px; }
+      nav.main a { text-decoration: none; color: var(--muted); }
+      nav.main a:hover { color: var(--ink); }
+      .cart { position: relative; display: inline-flex; align-items: center; gap: 8px; padding: 8px 12px; border: 1px solid var(--line); border-radius: 999px; background: var(--card); color: var(--ink); font: inherit; font-size: 14px; cursor: pointer; }
+      .cart svg { width: 20px; height: 20px; }
+      .cart b { min-width: 22px; padding: 1px 6px; border-radius: 999px; background: var(--accent); color: var(--accent-ink); font-size: 12px; text-align: center; transition: transform .2s; }
+      .cart b.bump { transform: scale(1.35); }
+
+      .hero { padding: 32px 0 40px; }
+      .hero .wrap { display: grid; gap: 28px; }
+      .hero h1 { margin: 0 0 14px; font-size: clamp(36px, 7vw, 60px); line-height: 1.05; }
+      .hero p.lead { margin: 0 0 24px; color: var(--muted); font-size: 18px; max-width: 34ch; }
+      .actions { display: flex; flex-wrap: wrap; gap: 12px; }
+      .btn { display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 0 22px; border-radius: 999px; border: 1px solid var(--ink); background: var(--ink); color: #fff; font: inherit; font-weight: 600; text-decoration: none; cursor: pointer; }
+      .btn.ghost { background: transparent; color: var(--ink); }
+      .btn:disabled { opacity: .5; cursor: not-allowed; }
+      .hero-media { position: relative; height: 340px; overflow: hidden; border-radius: 24px; background: #e9dccb; }
+      .hero-media video { width: 100%; height: 100%; object-fit: cover; }
+
+      section { padding: 40px 0; scroll-margin-top: 72px; }
+      .section-head { margin-bottom: 20px; }
+      .section-head h2 { margin: 0 0 6px; font-size: clamp(26px, 4vw, 36px); }
+      .section-head p { margin: 0; color: var(--muted); }
+      /* the widget pads its own strip by 16px; pull it out so it lines up with the page grid */
+      .embed { margin: 0 -16px; }
+
+      .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+      .product { display: flex; flex-direction: column; background: var(--card); border: 1px solid var(--line); border-radius: 16px; overflow: hidden; }
+      .product .img { aspect-ratio: 4 / 3; background: #efe4d4; }
+      .product .img img { width: 100%; height: 100%; object-fit: cover; }
+      .product .body { display: flex; flex: 1; flex-direction: column; gap: 4px; padding: 12px 14px 14px; }
+      .product h3 { margin: 0; font-size: 17px; line-height: 1.25; }
+      .product .price { color: var(--muted); }
+      .product .btn { margin-top: auto; min-height: 42px; }
+      .gift { display: grid; place-items: center; height: 100%; padding: 16px; background: var(--accent); color: #fff; text-align: center; font-family: ui-serif, Georgia, serif; font-size: 26px; line-height: 1.1; }
+
+      .story { background: var(--card); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+      .story .wrap { display: grid; gap: 12px; max-width: 760px; }
+      .story h2 { margin: 0; font-size: clamp(26px, 4vw, 36px); }
+      .story p { margin: 0; color: var(--muted); font-size: 18px; }
+
+      footer.site { padding: 36px 0 48px; color: var(--muted); font-size: 14px; }
+      footer.site .wrap { display: grid; gap: 20px; }
+      footer.site h4 { margin: 0 0 6px; color: var(--ink); font-size: 14px; }
+      footer.site ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 4px; }
+      footer.site .fine { border-top: 1px solid var(--line); padding-top: 16px; font-size: 13px; }
+
+      @media (min-width: 720px) {
+        nav.main { display: flex; }
+        .grid { grid-template-columns: repeat(3, 1fr); gap: 20px; }
+        footer.site .wrap { grid-template-columns: 2fr 1fr 1fr; }
+      }
+      @media (min-width: 960px) {
+        .hero { padding: 56px 0 64px; }
+        .hero .wrap { grid-template-columns: 1.1fr .9fr; align-items: center; gap: 56px; }
+        .hero-media { height: 520px; }
+        section { padding: 56px 0; }
+        .embed { margin: 0 -16px; }
+      }
+      @media (prefers-reduced-motion: reduce) { .cart b { transition: none; } }
     </style>
   </head>
   <body>
+    <div class="announce">Free pickup on orders over $30 · Fresh bread every morning from 7am</div>
+
+    <header class="site">
+      <div class="wrap">
+        <a class="logo" href="/">Hearth <span>&amp;</span> Crumb</a>
+        <nav class="main" aria-label="Main">
+          <a href="#shop">Shop</a>
+          <a href="#watch">Watch &amp; shop</a>
+          <a href="#story">Our story</a>
+          <a href="#visit">Visit</a>
+        </nav>
+        <button class="cart" type="button" aria-label="Cart">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 7h12l-1 12H7L6 7Z"/><path d="M9 7a3 3 0 0 1 6 0"/></svg>
+          Cart <b id="cart-count" aria-live="polite">0</b>
+        </button>
+      </div>
+    </header>
+
     <main>
-      <h1>Summer collection</h1>
-      <p>Store content above the widget.</p>
-      <!-- min-height is inline so space is reserved BEFORE widget.js loads: no layout shift -->
-      <div data-source="poc" data-embedding-id="home-carousel" data-store="mock" style="min-height: 300px"></div>
-      <p>Same widget, different embedding id = different config (videos and accent color from Firestore).</p>
-      <div data-source="poc" data-embedding-id="pdp-carousel" data-store="mock" style="min-height: 300px"></div>
-      <p>An unknown id hides the widget and leaves no gap:</p>
-      <div data-source="poc" data-embedding-id="does-not-exist"></div>
-      <h2>Revenue attributed to video (home-carousel)</h2>
-      <pre id="stats">loading…</pre>
-      <p>End of page.</p>
+      <section class="hero">
+        <div class="wrap">
+          <div>
+            <h1>Baked slowly.<br />Shared fresh.</h1>
+            <p class="lead">A small-batch bakery and coffee bar: sourdough, pastries and single-origin coffee, made every morning in our neighborhood kitchen.</p>
+            <div class="actions">
+              <a class="btn" href="#shop">Shop the bakery</a>
+              <a class="btn ghost" href="#watch">Watch &amp; shop</a>
+            </div>
+          </div>
+          <div class="hero-media">
+            <video src="/media/pastry-case.mp4" poster="/media/pastry-case.jpg" autoplay muted loop playsinline aria-label="Our pastry case"></video>
+          </div>
+        </div>
+      </section>
+
+      <section id="watch">
+        <div class="wrap">
+          <div class="section-head">
+            <h2>Watch &amp; shop</h2>
+            <p>See it made, then take it home. Tap a video to shop what's in it.</p>
+          </div>
+          <!-- The widget. min-height is inline so the space is reserved BEFORE widget.js loads (no layout shift). -->
+          <div class="embed" data-source="poc" data-embedding-id="demo-bakery" data-store="mock" style="min-height: 300px"></div>
+        </div>
+      </section>
+
+      <section id="shop">
+        <div class="wrap">
+          <div class="section-head">
+            <h2>Fresh from the oven</h2>
+            <p>Order by 6pm for pickup the next morning.</p>
+          </div>
+          <div class="grid" id="grid" aria-live="polite"></div>
+        </div>
+      </section>
+
+      <section class="story" id="story">
+        <div class="wrap">
+          <h2>Our story</h2>
+          <p>We started with one oven and a jar of starter. Today we still shape every loaf by hand, roast coffee in small lots, and never bake more than we can sell by closing time.</p>
+        </div>
+      </section>
     </main>
+
+    <footer class="site" id="visit">
+      <div class="wrap">
+        <div>
+          <h4>Hearth &amp; Crumb Bakery</h4>
+          <p>A fictional bakery. This page is a demo store for a shoppable video widget.</p>
+        </div>
+        <div>
+          <h4>Visit</h4>
+          <ul><li>12 Maple Street</li><li>Open daily, 7am to 5pm</li><li>hello@hearthandcrumb.example</li></ul>
+        </div>
+        <div>
+          <h4>Demo pages</h4>
+          <ul>
+            <li><a href="/dashboard.html">Analytics dashboard</a></li>
+            <li><a href="/isolation-test.html">Shadow DOM isolation test</a></li>
+          </ul>
+        </div>
+        <p class="fine" style="grid-column: 1 / -1; margin: 0">
+          Videos and photos are from Pexels (Michael Burrows, Anna Tarazevich, Uriel Mont, Eva Bronzini, Pavel Danilyuk), used under the Pexels License.
+          Products and prices are made up.
+        </p>
+      </div>
+    </footer>
+
+    <!-- The widget. async: it never blocks the page. -->
     <script async src="./widget.js"></script>
     <script>
-      // Demo only: poll the stats endpoint so you can watch the numbers move.
-      const show = () =>
-        fetch('/api/stats?id=home-carousel').then((r) => r.json()).then((d) => (document.getElementById('stats').textContent = JSON.stringify(d, null, 2)));
-      show();
-      setInterval(show, 2000);
+      // ---- Everything below is "the merchant's theme", not the widget. ----
+      const HANDLES = ['house-blend-coffee', 'chocolate-croissant', 'weekend-pastry-box', 'rustic-flatbreads', 'country-sourdough'];
+      const money = (cents) => new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD' }).format(cents / 100);
+
+      // Cart count lives in the page. A real Shopify theme would read it from /cart.js or its own cart component.
+      const countEl = document.getElementById('cart-count');
+      let count = Number(sessionStorage.getItem('cart-count') || 0);
+      const render = (bump) => {
+        countEl.textContent = count;
+        if (bump) { countEl.classList.add('bump'); setTimeout(() => countEl.classList.remove('bump'), 220); }
+      };
+      render(false);
+      const setCount = (n) => { count = n; sessionStorage.setItem('cart-count', String(n)); render(true); };
+
+      // The widget announces cart changes with a DOM event. event.detail.count is Shopify's real count when the store
+      // can provide it; the demo store can't, so it counts itself.
+      window.addEventListener('poc:cart-add', (e) => setCount(e.detail.count ?? count + 1));
+
+      // Product grid, read from the same Shopify-shaped JSON files the widget uses.
+      Promise.all(HANDLES.map((h) => fetch(`/products/${h}.js`).then((r) => r.json()))).then((products) => {
+        const grid = document.getElementById('grid');
+        grid.innerHTML = products.map((p) => `
+          <article class="product">
+            <div class="img"><img src="${p.featured_image}" alt="" loading="lazy" width="480" height="480" /></div>
+            <div class="body">
+              <h3>${p.title}</h3>
+              <span class="price">${money(p.price)}</span>
+              <button class="btn" type="button" data-handle="${p.handle}" ${p.available ? '' : 'disabled'}>${p.available ? 'Add to cart' : 'Sold out'}</button>
+            </div>
+          </article>`).join('') + `
+          <article class="product">
+            <div class="img"><div class="gift">Hearth &amp; Crumb<br />Gift card</div></div>
+            <div class="body"><h3>Gift card</h3><span class="price">${money(2500)}</span><button class="btn" type="button" data-handle="gift-card">Add to cart</button></div>
+          </article>`;
+        grid.addEventListener('click', (e) => {
+          const b = e.target.closest('button[data-handle]');
+          if (b && !b.disabled) setCount(count + 1);
+        });
+      }).catch(() => {});
     </script>
   </body>
 </html>

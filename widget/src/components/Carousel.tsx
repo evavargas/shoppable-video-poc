@@ -1,17 +1,26 @@
 import { useEffect, useRef, useState } from 'react';
-import type { Video } from '../types';
+import { formatPrice, prefersReducedMotion } from '../format';
+import type { Product, Store, Video } from '../types';
 import { useInView } from './useInView';
 
-function VideoCard({ video, onOpen, onView }: { video: Video; onOpen: (v: Video) => void; onView: (v: Video) => void }) {
+interface CardProps {
+  video: Video;
+  store: Store;
+  onOpen: () => void;
+  onView: (v: Video) => void;
+}
+
+function VideoCard({ video, store, onOpen, onView }: CardProps) {
   const card = useRef<HTMLButtonElement>(null);
   const el = useRef<HTMLVideoElement>(null);
   // Two thresholds: start downloading a bit before the card is visible, play only when mostly visible.
   const nearby = useInView(card, 0, '0px 300px');
   const playing = useInView(card, 0.6);
   const [loaded, setLoaded] = useState(false);
+  const [product, setProduct] = useState<Product>();
   const seen = useRef(false);
 
-  // One impression per video per page load, counted when it is actually playing in view.
+  // One impression per video per page load, counted when it is actually in view.
   useEffect(() => {
     if (playing && !seen.current) {
       seen.current = true;
@@ -20,30 +29,56 @@ function VideoCard({ video, onOpen, onView }: { video: Video; onOpen: (v: Video)
   }, [playing, onView, video]);
 
   useEffect(() => {
-    if (nearby) setLoaded(true);
-  }, [nearby]);
+    if (!nearby) return;
+    setLoaded(true);
+    const handle = video.productHandles[0];
+    // Price comes from the store (source of truth). Failing to load it just hides the price.
+    if (handle) store.getProduct(handle).then(setProduct).catch(() => {});
+  }, [nearby, store, video.productHandles]);
 
   useEffect(() => {
     const v = el.current;
-    if (!v || !loaded) return;
-    if (playing) v.play()?.catch(() => {}); // autoplay can be refused; the poster-less card stays usable
+    if (!v || !loaded || prefersReducedMotion()) return; // reduced motion: the poster stays, nothing autoplays
+    if (playing) v.play()?.catch(() => {}); // autoplay can be refused; the poster keeps the card usable
     else v.pause();
   }, [playing, loaded]);
 
   return (
-    <button ref={card} type="button" className="card" aria-label={`Watch: ${video.title}`} onClick={() => onOpen(video)}>
-      <video ref={el} src={loaded ? video.src : undefined} muted loop playsInline preload="metadata" />
-      <span className="label">{video.title}</span>
+    <button
+      ref={card}
+      type="button"
+      className="card"
+      aria-label={`Watch: ${video.title}${video.liveId ? ', live' : ''}`}
+      onClick={onOpen}
+    >
+      <video ref={el} src={loaded ? video.src : undefined} poster={video.poster} muted loop playsInline preload="metadata" />
+      {video.liveId && (
+        <span className="live-pill" aria-hidden="true">
+          <span className="dot" />
+          LIVE
+        </span>
+      )}
+      <span className="label">
+        <span className="title">{video.title}</span>
+        {product && <span className="price">{product.available ? formatPrice(product) : 'Sold out'}</span>}
+      </span>
     </button>
   );
 }
 
-export function Carousel({ videos, onOpen, onView }: { videos: Video[]; onOpen: (v: Video) => void; onView: (v: Video) => void }) {
+interface Props {
+  videos: Video[];
+  store: Store;
+  onOpen: (index: number) => void;
+  onView: (v: Video) => void;
+}
+
+export function Carousel({ videos, store, onOpen, onView }: Props) {
   return (
     <ul className="strip" aria-label="Shop the videos">
-      {videos.map((v) => (
+      {videos.map((v, i) => (
         <li key={v.id}>
-          <VideoCard video={v} onOpen={onOpen} onView={onView} />
+          <VideoCard video={v} store={store} onOpen={() => onOpen(i)} onView={onView} />
         </li>
       ))}
     </ul>
