@@ -198,7 +198,9 @@ npm run emulators        # builds widget + functions, starts Firestore, Function
 npm run seed             # in a second terminal: loads sample embeds + a live room
 ```
 
-Open http://127.0.0.1:5002 (fake store page, mock products) and http://127.0.0.1:4000 (Emulator UI).
+Open http://127.0.0.1:5002 (the Merece demo store, with Shopify-style mock products) and http://127.0.0.1:4000 (Emulator UI). Stop everything with `Ctrl+C` in the terminal running `npm run emulators`.
+
+To change the catalog edit `scripts/merece-catalog.json` and run `npm run build:products`. Local note: the Hosting emulator has no HTTP Range support, so you cannot scrub inside a video locally (it works on real Hosting).
 
 ```bash
 npm test -w widget && npm test -w functions && npm run typecheck -w widget
@@ -300,6 +302,6 @@ shopify/     custom-liquid.html: the snippet to paste into a theme
 ## Putting it on a real store
 
 1. Copy `functions/.env.example` to `functions/.env` and fill in your Firebase web API key.
-2. Deploy: `npx firebase deploy --project <id>` from the repo root with a real project (Cloud Functions need the Blaze plan; set the `WEB_API_KEY` env var for the live bundle).
-3. Replace the seed `productHandles` with handles that exist in your store, and seed Firestore in the real project.
-4. Paste `shopify/custom-liquid.html` into a Custom Liquid section, replacing `YOUR_HOST` with your Hosting domain.
+2. Deploy: `npm run deploy` builds the widget and the functions, then runs `firebase deploy --project terry-shop` and sends the same Hosting files to the legacy site (`firebase.legacy.json`). With your own project, change the project id and the `site` in `firebase.json` (Cloud Functions need the Blaze plan). The public address of this demo is https://merece.web.app (Hosting site `merece` inside the Firebase project `terry-shop`).
+3. Load the data: `GOOGLE_CLOUD_QUOTA_PROJECT=<id> node firebase/seed.mjs --project <id> --file firebase/prod-data.json` (it overwrites documents with the same ids).
+4. For a Shopify store, replace the `productHandles` in the config with handles that exist in your store, then paste `shopify/custom-liquid.html` into a Custom Liquid section. It already points to `https://merece.web.app/widget.js`; use your own Hosting domain for your own deployment.
