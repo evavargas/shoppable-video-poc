@@ -3,6 +3,7 @@ import { formatPrice, prefersReducedMotion } from '../format';
 import { root } from '../shopify';
 import type { Layout, LiveApi, Product, Store, Video } from '../types';
 import { HotspotLayer } from './Hotspots';
+import { HeartLayer, useHearts } from './useHearts';
 import { Live } from './Live';
 import { StoryProgress } from './StoryProgress';
 
@@ -107,6 +108,26 @@ function Sheet({ handle, store, onClose, onAdded }: { handle: string; store: Sto
   );
 }
 
+/** The product the host pinned during the live. Swaps with a short highlight; fails silently (no pin shown). */
+function Pinned({ handle, store, onAdded }: { handle: string; store: Store; onAdded: (p: Product) => void }) {
+  const [product, setProduct] = useState<Product>();
+  useEffect(() => {
+    let off = false;
+    store.getProduct(handle).then((p) => !off && setProduct(p)).catch(() => {});
+    return () => {
+      off = true;
+    };
+  }, [handle, store]);
+  if (!product) return null;
+  return (
+    <div className="pinned">
+      <p className="pin-note">📌 Pinned by the host</p>
+      <span role="status" className="sr-only">{`The host pinned: ${product.title}`}</span>
+      <ProductCard product={product} store={store} onAdded={onAdded} />
+    </div>
+  );
+}
+
 interface PlayerProps {
   layout: Layout;
   videos: Video[];
@@ -116,15 +137,18 @@ interface PlayerProps {
   onOpenVideo: (video: Video) => void; // a different video was opened by swiping or keys
   onAdded: (video: Video, product: Product) => void;
   onHotspot: (video: Video, handle: string) => void;
+  onReaction: (video: Video, count: number) => void;
   onClose: () => void;
 }
 
 const SWIPE_MIN_PX = 60;
 
-export function Player({ layout, videos, startIndex, store, connectLive, onOpenVideo, onAdded, onHotspot, onClose }: PlayerProps) {
+export function Player({ layout, videos, startIndex, store, connectLive, onOpenVideo, onAdded, onHotspot, onReaction, onClose }: PlayerProps) {
   const dialog = useRef<HTMLDialogElement>(null);
   const touch = useRef<{ x: number; y: number } | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const hearts = useHearts();
+  const [pinned, setPinned] = useState<string | null>(null); // handle pinned by the host on the current live
   const [selected, setSelected] = useState<string | null>(null); // handle of the product opened from a hotspot
   const [index, setIndex] = useState(startIndex);
   const [dir, setDir] = useState<'next' | 'prev' | 'none'>('none');
@@ -224,6 +248,7 @@ export function Player({ layout, videos, startIndex, store, connectLive, onOpenV
             onAdded={(p) => onAdded(video, p)}
           />
         )}
+        <HeartLayer items={hearts.items} remove={hearts.remove} />
         {videos.length > 1 && (
           <div className="nav">
             <button type="button" aria-label="Previous video" disabled={index === 0} onClick={() => go(-1)}>
@@ -239,8 +264,18 @@ export function Player({ layout, videos, startIndex, store, connectLive, onOpenV
         </p>
       </div>
       {/* Sibling keys must be unique: two siblings sharing a key leave stale DOM nodes behind. */}
-      {video.liveId && <Live key={`live-${video.liveId}`} liveId={video.liveId} connect={connectLive} />}
+      {video.liveId && (
+        <Live
+          key={`live-${video.liveId}`}
+          liveId={video.liveId}
+          connect={connectLive}
+          onPinned={setPinned}
+          onHearts={hearts.burst}
+          onReaction={(n) => onReaction(video, n)}
+        />
+      )}
       <div className="products">
+        {video.liveId && pinned && <Pinned key={pinned} handle={pinned} store={store} onAdded={(p) => onAdded(video, p)} />}
         <ProductList key={video.id} video={video} store={store} onAdded={(p) => onAdded(video, p)} />
       </div>
     </dialog>

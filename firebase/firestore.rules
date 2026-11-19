@@ -18,6 +18,26 @@ service cloud.firestore {
           && request.resource.data.at == request.time; // server clock only, so nobody can fake ordering
       }
 
+      // Presence: each open player writes its own heartbeat doc (id = session id) every 30 s. The widget counts docs seen in the last 75 s.
+      // No auth, so anyone can delete a heartbeat; that can only lower a counter. Real presence would use RTDB onDisconnect.
+      match /viewers/{sessionId} {
+        allow read: if true;
+        allow create, update: if sessionId.matches('^[A-Za-z0-9_-]{1,64}$')
+          && request.resource.data.keys().hasOnly(['lastSeen'])
+          && request.resource.data.lastSeen == request.time;
+        allow delete: if sessionId.matches('^[A-Za-z0-9_-]{1,64}$');
+      }
+
+      // Hearts: create-only, one document per flushed batch (the client sends at most one per second).
+      match /reactions/{reactionId} {
+        allow read: if true;
+        allow create: if request.resource.data.keys().hasOnly(['type', 'count', 'sessionId', 'at'])
+          && request.resource.data.type == 'heart'
+          && request.resource.data.count is int && request.resource.data.count >= 1 && request.resource.data.count <= 20
+          && request.resource.data.sessionId is string && request.resource.data.sessionId.size() <= 64
+          && request.resource.data.at == request.time;
+      }
+
       // One doc per voter (id = session id) and create-only: that is what stops changing a vote.
       // A new session id can vote again; real prevention needs auth. See README.
       match /votes/{sessionId} {

@@ -62,7 +62,7 @@ export function MiniPlayer({ embeddingId, videos, fetchLiveStatus, connectLive, 
     connectLive()
       .then((api) => {
         if (off) return;
-        stop = api.watchStatus(liveId, (s) => setLive(s === 'live'));
+        stop = api.watchLive(liveId, (state) => setLive(state?.status === 'live'));
       })
       .catch(() => {}); // can't listen: the mini-player stays as it was, which is fine
     return () => {

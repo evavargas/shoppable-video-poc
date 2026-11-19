@@ -67,11 +67,30 @@ export interface Poll {
   myVote?: string;
 }
 
+/** The live-level fields the host controls, delivered by one document listener. */
+export interface LiveState {
+  status: string; // 'live' | 'scheduled' | 'ended' (anything else is treated as ended by the consumer)
+  pinnedProduct: string | null; // product handle the host pinned, if any
+}
+
+export interface Reaction {
+  id: string;
+  count: number;
+  sessionId: string;
+}
+
 /** Implemented by live.js (the Firebase bundle). The main widget only knows this interface. */
 export interface LiveApi {
   watchPoll(liveId: string, sessionId: string, cb: (poll: Poll | null) => void): () => void;
-  /** Real-time `status` of the live ('live', 'scheduled', 'ended'); null if the document does not exist. */
-  watchStatus(liveId: string, cb: (status: string | null) => void): () => void;
+  /** Real-time fields of lives/{liveId} (status, pinned product); null if the document does not exist. */
+  watchLive(liveId: string, cb: (state: LiveState | null) => void): () => void;
+  /** Presence: write this viewer's heartbeat, remove it on leaving, and read everyone's last-seen times (ms). */
+  heartbeat(liveId: string, sessionId: string): Promise<void>;
+  leave(liveId: string, sessionId: string): Promise<void>;
+  watchViewers(liveId: string, cb: (lastSeenMs: number[]) => void): () => void;
+  /** Hearts: one write per batch; the listener only delivers batches that arrive after it started. */
+  sendReactions(liveId: string, sessionId: string, count: number): Promise<void>;
+  watchReactions(liveId: string, cb: (r: Reaction) => void): () => void;
   watchMessages(liveId: string, cb: (messages: ChatMessage[]) => void): () => void;
   sendMessage(liveId: string, name: string, text: string): Promise<void>;
   vote(liveId: string, sessionId: string, optionId: string): Promise<void>;

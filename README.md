@@ -5,7 +5,7 @@
 **Live demo:** https://terry-shop.web.app is a fictional bakery store (Hearth & Crumb) with the widget embedded.
 The page simulates a merchant's theme and its products are Shopify-shaped JSON files; the config, live chat, poll and stats are real (Firestore + Cloud Functions).
 
-> **Status:** hotspots, the stories layout and the floating live mini-player are built and tested in this repo, but the live site at `terry-shop.web.app` has not been redeployed with them yet.
+> **Status:** hotspots, the stories layout, the floating live mini-player and the live extras (viewer count, hearts, pinned product) are built and tested in this repo, but the live site at `terry-shop.web.app` has not been redeployed with them yet.
 > Run the emulators to see everything. What is done, what is planned next (features 4 to 7) and the deploy checklist are in [`docs/ROADMAP.md`](docs/ROADMAP.md).
 
 | Demo page | What it shows |
@@ -28,6 +28,7 @@ The page simulates a merchant's theme and its products are Shopify-shaped JSON f
 | Autoplay only what is visible | IntersectionObserver: videos get `src` when near, play at 60% visible, pause when not |
 | Full-screen player | Native `<dialog>` (focus trap, Esc), open/close animation, product card with Add to cart |
 | Swipe between videos | Swipe up/down on touch, Arrow keys, or the on-screen buttons. Each opened video is tracked as a `video_click` |
+| Live extras | Viewer count ("N watching"), hearts that float over the video, and a product the host pins in real time (see below) |
 | Floating live mini-player | `layout: "floating"`: a small player in the corner of every page while a live is on; dismissible for the session; expands into the full player (see below) |
 | Stories layout | `layout: "stories"` in the config turns the carousel into a row of round avatars; the same full-screen player opens with progress bars and auto-advance (see below) |
 | Timed product hotspots | A tappable chip on the video between `start` and `end` seconds at `x`/`y` percent; tapping opens a product card over the video (see below) |
@@ -35,6 +36,27 @@ The page simulates a merchant's theme and its products are Shopify-shaped JSON f
 | Cart count in the store header | After a successful add, the widget dispatches a `poc:cart-add` event (see below) |
 | Reduced motion | `prefers-reduced-motion` turns off animations and autoplay previews |
 | Resilience | Any failure (config, products, Firebase) hides the widget or the live panel; the store page keeps working |
+
+### Live extras: viewer count, hearts and pinned product
+
+Three small real-time features in the live panel. They all live in the lazily loaded `live.js`, and each one stops when the player closes.
+
+| Extra | Data in Firestore | How it works |
+|---|---|---|
+| **N watching** | `lives/{id}/viewers/{sessionId}` = `{ lastSeen }` | Every open player writes a heartbeat when it joins and every 30 s (not while the tab is hidden), and deletes it on leaving. The client listens to the newest 100 docs and counts those seen in the last 75 s. A timer recounts every 15 s, because nothing changes in the database when someone silently leaves. Shows `100+` when the capped query is full. |
+| **Hearts** | `lives/{id}/reactions/{auto}` = `{ type, count, sessionId, at }` | Every tap animates a heart at once, but taps are counted and written **at most once per second** as one document with `count` (max 20). Other viewers' batches float `min(count, 8)` hearts. History is never replayed (the first snapshot is ignored), the screen is capped at 30 hearts, and a timer removes hearts even if the CSS animation never runs. Reduced motion: nothing floats, only the counter changes. |
+| **Pinned product** | `lives/{id}.pinnedProduct` = a product handle or `null` | The same document listener the mini-player uses. The player shows a highlighted "Pinned by the host" card above the product list, announces changes politely (`role="status"`), validates the handle before using it, and shows nothing if the product can't be loaded. Add to cart from it is tracked like any other. |
+
+Analytics: a `reaction` event per flushed batch, with its `count`; the dashboard shows the `reactions` total.
+
+Security (see `firebase/firestore.rules`): viewers can only write their own heartbeat with the server time; reactions are create-only, `type == 'heart'`, `count` an integer 1 to 20, server time; nobody but the Admin SDK can write the live document, so a viewer can't pin a product. I checked the rules by hand against the emulator (oversized count, extra field, wrong keys and a bad id are rejected, and so is writing `pinnedProduct`). Automated rules tests are still on the roadmap.
+
+**Cost and limits, honestly:**
+- **Heartbeats:** each client listens to the viewers collection, so one heartbeat causes one read per connected viewer: the cost grows with the square of the audience. The query cap (100) bounds it, which is fine for a PoC. At scale a scheduled Cloud Function would write one `viewerCount` field every 10 s and clients would listen to that single document, with a Firestore TTL policy deleting stale heartbeats. The textbook tool is Realtime Database presence (`onDisconnect`), at the price of a second database.
+- **Hearts:** batching turns "one write per tap" into "one write per viewer per second". A very large audience would aggregate counts in a function instead of storing every batch.
+- **No auth:** anyone can delete a heartbeat, which can only lower a counter. A pinned product is only as trustworthy as the host's write access (the host control page and real auth are feature 7 on the roadmap).
+
+![Live panel with viewer count, hearts and pinned product](docs/live-hearts.png)
 
 ### Floating live mini-player
 
@@ -216,7 +238,7 @@ flowchart LR
 
 | File | Size | Loaded |
 |---|---|---|
-| `widget.js` | ~72 KB (React + ReactDOM are most of it) | Always |
+| `widget.js` | ~75 KB (React + ReactDOM are most of it) | Always |
 | `live.js` | ~143 KB (Firebase Firestore SDK) | Only when a live video opens |
 
 `npm run build -w widget` prints the current numbers.

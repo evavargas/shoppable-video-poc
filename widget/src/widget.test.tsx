@@ -6,7 +6,8 @@ import { mount } from './mount';
 import { intersect } from './test-setup';
 import { Live } from './components/Live';
 import { Stories } from './components/Stories';
-import type { ChatMessage, EmbedConfig, LiveApi, Poll, Product, Store } from './types';
+import { sessionId } from './track';
+import type { ChatMessage, EmbedConfig, LiveApi, LiveState, Poll, Product, Reaction, Store } from './types';
 
 const product: Product = { handle: 'tee', title: 'Cotton Tee', price: 29, currency: 'USD', variantId: 7, available: true };
 const makeStore = (p: Product = product): Store => ({
@@ -26,6 +27,42 @@ const twoVideos: EmbedConfig = {
     { id: 'v2', src: 'https://x.test/v2.mp4', title: 'Winter coats', productHandles: ['tee'] },
   ],
 };
+
+
+/** A complete fake of live.js: every listener is captured so a test can push data, and every unsubscribe is a spy. */
+function makeLiveApi() {
+  const h = {
+    poll: (_p: Poll | null) => {},
+    messages: (_m: ChatMessage[]) => {},
+    live: (_s: LiveState | null) => {},
+    viewers: (_t: number[]) => {},
+    reactions: (_r: Reaction) => {},
+  };
+  const off = { poll: vi.fn(), chat: vi.fn(), live: vi.fn(), viewers: vi.fn(), reactions: vi.fn() };
+  const api: LiveApi = {
+    watchPoll: vi.fn((_id, _s, cb) => ((h.poll = cb), off.poll)),
+    watchMessages: vi.fn((_id, cb) => ((h.messages = cb), off.chat)),
+    watchLive: vi.fn((_id, cb) => ((h.live = cb), off.live)),
+    heartbeat: vi.fn().mockResolvedValue(undefined),
+    leave: vi.fn().mockResolvedValue(undefined),
+    watchViewers: vi.fn((_id, cb) => ((h.viewers = cb), off.viewers)),
+    sendReactions: vi.fn().mockResolvedValue(undefined),
+    watchReactions: vi.fn((_id, cb) => ((h.reactions = cb), off.reactions)),
+    sendMessage: vi.fn().mockResolvedValue(undefined),
+    vote: vi.fn().mockResolvedValue(undefined),
+  };
+  return {
+    api,
+    off,
+    push: {
+      poll: (p: Poll) => act(() => h.poll(p)),
+      messages: (m: ChatMessage[]) => act(() => h.messages(m)),
+      live: (st: LiveState | null) => act(() => h.live(st)),
+      viewers: (t: number[]) => act(() => h.viewers(t)),
+      reaction: (r: Reaction) => act(() => h.reactions(r)),
+    },
+  };
+}
 
 const track = vi.fn();
 const connectLive = vi.fn().mockRejectedValue(new Error('no live in this test'));
@@ -330,10 +367,8 @@ describe('Floating live mini-player', () => {
   };
 
   function fakeApi() {
-    let onStatus: (s: string | null) => void = () => {};
-    const stop = vi.fn();
-    const api = { watchStatus: vi.fn((_id: string, cb: (s: string | null) => void) => ((onStatus = cb), stop)) } as unknown as LiveApi;
-    return { api, stop, status: (st: string | null) => act(() => onStatus(st)) };
+    const f = makeLiveApi();
+    return { api: f.api, stop: f.off.live, status: (st: string | null) => f.push.live(st === null ? null : { status: st, pinnedProduct: null }) };
   }
 
   const mountMini = (status: string, connect = connectLive) => {
@@ -359,7 +394,7 @@ describe('Floating live mini-player', () => {
     const mini = await screen.findByRole('complementary', { name: 'Live now' });
     expect(mini).toHaveTextContent('LIVE');
     expect(track).toHaveBeenCalledWith({ type: 'view', videoId: 'v2' });
-    await vi.waitFor(() => expect(api.watchStatus).toHaveBeenCalledWith('l1', expect.any(Function)));
+    await vi.waitFor(() => expect(api.watchLive).toHaveBeenCalledWith('l1', expect.any(Function)));
 
     status('ended');
     expect(screen.queryByRole('complementary')).toBeNull();
@@ -487,35 +522,10 @@ describe('mount', () => {
 });
 
 describe('Live', () => {
-  function fakeLive() {
-    let onPoll: (p: Poll | null) => void = () => {};
-    let onMessages: (m: ChatMessage[]) => void = () => {};
-    let onStatus: (s: string | null) => void = () => {};
-    const api: LiveApi = {
-      watchStatus: vi.fn((_id, cb) => {
-        onStatus = cb;
-        return vi.fn();
-      }),
-      watchPoll: vi.fn((_id, _s, cb) => {
-        onPoll = cb;
-        return vi.fn();
-      }),
-      watchMessages: vi.fn((_id, cb) => {
-        onMessages = cb;
-        return vi.fn();
-      }),
-      sendMessage: vi.fn().mockResolvedValue(undefined),
-      vote: vi.fn().mockResolvedValue(undefined),
-    };
-    return {
-      api,
-      push: {
-        poll: (p: Poll) => act(() => onPoll(p)),
-        messages: (m: ChatMessage[]) => act(() => onMessages(m)),
-        status: (st: string | null) => act(() => onStatus(st)),
-      },
-    };
-  }
+  const fakeLive = () => {
+    const f = makeLiveApi();
+    return { api: f.api, push: f.push };
+  };
 
   it('shows realtime chat and poll, sends messages and votes', async () => {
     const { api, push } = fakeLive();
@@ -547,5 +557,221 @@ describe('Live', () => {
 
     const { container } = render(<Live liveId="l1" connect={() => Promise.reject(new Error('blocked'))} />);
     await vi.waitFor(() => expect(container).toBeEmptyDOMElement());
+  });
+});
+
+describe('Live extras: viewer count (4a)', () => {
+  const connected = async (props: Partial<Parameters<typeof Live>[0]> = {}) => {
+    const f = makeLiveApi();
+    const view = render(<Live liveId="l1" connect={async () => f.api} {...props} />);
+    await act(async () => {}); // let connect() resolve
+    return { ...f, ...view };
+  };
+
+  afterEach(() => {
+    vi.useRealTimers();
+    Object.defineProperty(document, 'hidden', { value: false, configurable: true });
+  });
+
+  it('writes a heartbeat on join and every 30 s, skips it while the tab is hidden, and leaves on close', async () => {
+    vi.useFakeTimers();
+    const { api, unmount, off } = await connected();
+    expect(api.heartbeat).toHaveBeenCalledTimes(1);
+    expect(api.heartbeat).toHaveBeenCalledWith('l1', sessionId);
+
+    act(() => vi.advanceTimersByTime(30_000));
+    expect(api.heartbeat).toHaveBeenCalledTimes(2);
+
+    Object.defineProperty(document, 'hidden', { value: true, configurable: true });
+    act(() => vi.advanceTimersByTime(60_000));
+    expect(api.heartbeat).toHaveBeenCalledTimes(2); // a hidden tab stops counting as watching
+
+    unmount();
+    expect(api.leave).toHaveBeenCalledWith('l1', sessionId);
+    expect(off.viewers).toHaveBeenCalled();
+    act(() => vi.advanceTimersByTime(60_000));
+    expect(api.heartbeat).toHaveBeenCalledTimes(2); // timers are gone
+  });
+
+  it('counts only fresh heartbeats, and recounts over time because nothing changes when someone leaves', async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-01-01T12:00:00Z'));
+    const { push } = await connected();
+    const now = Date.now();
+    push.viewers([now, now - 10_000, now - 74_000, now - 200_000]); // the last one is stale
+    expect(screen.getByText('3 watching')).toBeInTheDocument();
+
+    act(() => vi.advanceTimersByTime(30_000)); // no new data, but time passed: the 74 s-old heartbeat is now stale (104 s)
+    expect(screen.getByText('2 watching')).toBeInTheDocument();
+  });
+
+  it('shows "100+" when the capped listener is full, and nothing before the first snapshot', async () => {
+    const { push } = await connected();
+    expect(screen.queryByText(/watching/)).toBeNull();
+    push.viewers(Array.from({ length: 100 }, () => Date.now()));
+    expect(screen.getByText('100+ watching')).toBeInTheDocument();
+  });
+});
+
+describe('Live extras: hearts (4b)', () => {
+  const connected = async (props: Partial<Parameters<typeof Live>[0]> = {}) => {
+    const f = makeLiveApi();
+    const view = render(<Live liveId="l1" connect={async () => f.api} {...props} />);
+    await act(async () => {});
+    return { ...f, ...view };
+  };
+
+  afterEach(() => vi.useRealTimers());
+
+  it('floats every tap at once but writes one batch per second', async () => {
+    vi.useFakeTimers();
+    const onHearts = vi.fn();
+    const onReaction = vi.fn();
+    const { api } = await connected({ onHearts, onReaction });
+    const button = screen.getByRole('button', { name: 'Send a heart' });
+
+    for (let i = 0; i < 3; i++) fireEvent.click(button);
+    expect(onHearts).toHaveBeenCalledTimes(3);
+    expect(api.sendReactions).not.toHaveBeenCalled();
+    expect(button).toHaveTextContent('3'); // running counter
+
+    act(() => vi.advanceTimersByTime(1000));
+    expect(api.sendReactions).toHaveBeenCalledTimes(1);
+    expect(api.sendReactions).toHaveBeenCalledWith('l1', sessionId, 3);
+    expect(onReaction).toHaveBeenCalledWith(3);
+
+    act(() => vi.advanceTimersByTime(5000));
+    expect(api.sendReactions).toHaveBeenCalledTimes(1); // idle: nothing more is written
+  });
+
+  it('caps a batch at 20 hearts however fast the user taps', async () => {
+    vi.useFakeTimers();
+    const { api } = await connected();
+    const button = screen.getByRole('button', { name: 'Send a heart' });
+    for (let i = 0; i < 35; i++) fireEvent.click(button);
+    act(() => vi.advanceTimersByTime(1000));
+    expect(api.sendReactions).toHaveBeenCalledWith('l1', sessionId, 20);
+  });
+
+  it("floats other viewers' hearts but not our own echo", async () => {
+    const onHearts = vi.fn();
+    const { push } = await connected({ onHearts });
+    push.reaction({ id: 'r1', count: 5, sessionId: 'someone-else' });
+    expect(onHearts).toHaveBeenCalledWith(5);
+    onHearts.mockClear();
+    push.reaction({ id: 'r2', count: 5, sessionId });
+    expect(onHearts).not.toHaveBeenCalled();
+  });
+});
+
+describe('Live extras in the player: hearts layer and pinned product (4b, 4c)', () => {
+  const liveConfig: EmbedConfig = {
+    ...config,
+    firebase: { projectId: 'p' },
+    videos: [{ id: 'v1', src: 'https://x.test/v1.mp4', title: 'Summer layers', productHandles: ['tee'], liveId: 'l1' }],
+  };
+  const hatStore = (): Store => ({
+    getProduct: vi.fn(async (h: string) => ({ ...product, handle: h, title: h === 'hat' ? 'Wool Hat' : 'Cotton Tee', price: h === 'hat' ? 35 : 29 })),
+    addToCart: vi.fn().mockResolvedValue(undefined),
+  });
+
+  const openLive = async (store = hatStore()) => {
+    const f = makeLiveApi();
+    render(<App embeddingId="t" loadConfig={async () => liveConfig} store={store} track={track} connectLive={async () => f.api} fetchLiveStatus={fetchLiveStatus} onFail={() => {}} />);
+    await userEvent.click(await screen.findByRole('button', { name: /watch: summer layers, live/i }));
+    await screen.findByRole('log'); // live panel connected
+    await vi.waitFor(() => expect(f.api.watchLive).toHaveBeenCalled());
+    return { ...f, store };
+  };
+  const hearts = () => document.querySelectorAll('.heart');
+
+  it('floats at most 8 hearts per burst and 30 on screen, and removes them by timer when no animation runs', async () => {
+    const { push } = await openLive(); // open first: findBy* and userEvent need real timers
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+    try {
+      push.reaction({ id: 'a', count: 20, sessionId: 'x' });
+      expect(hearts()).toHaveLength(8); // one burst is capped
+
+      for (let i = 0; i < 5; i++) push.reaction({ id: `b${i}`, count: 8, sessionId: 'x' });
+      expect(hearts()).toHaveLength(30); // the screen is capped
+
+      act(() => vi.advanceTimersByTime(2100));
+      expect(hearts()).toHaveLength(0); // the safety-net timer removed them, although no CSS animation ran in jsdom
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('floats nothing under reduced motion, but still counts', async () => {
+    Object.defineProperty(window, 'matchMedia', { value: () => ({ matches: true }), configurable: true });
+    try {
+      const { push } = await openLive();
+      push.reaction({ id: 'a', count: 5, sessionId: 'x' });
+      expect(hearts()).toHaveLength(0);
+      expect(screen.getByRole('button', { name: 'Send a heart' })).toHaveTextContent('5');
+    } finally {
+      delete (window as { matchMedia?: unknown }).matchMedia;
+    }
+  });
+
+  it('tracks a reaction batch with its count', async () => {
+    await openLive(); // open first: findBy* and userEvent need real timers
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+    try {
+      const heart = screen.getByRole('button', { name: 'Send a heart' });
+      fireEvent.click(heart);
+      fireEvent.click(heart);
+      act(() => vi.advanceTimersByTime(1000));
+      expect(track).toHaveBeenCalledWith({ type: 'reaction', videoId: 'v1', count: 2 });
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('shows the pinned product, swaps it, announces it, and removes it when unpinned', async () => {
+    const { push } = await openLive();
+    expect(screen.queryByText(/pinned by the host/i)).toBeNull();
+
+    push.live({ status: 'live', pinnedProduct: 'tee' });
+    expect(await screen.findByText(/pinned by the host/i)).toBeInTheDocument();
+    expect(await screen.findByText('The host pinned: Cotton Tee')).toBeInTheDocument();
+
+    push.live({ status: 'live', pinnedProduct: 'hat' });
+    expect(await screen.findByText('The host pinned: Wool Hat')).toBeInTheDocument();
+    expect(screen.queryByText('The host pinned: Cotton Tee')).toBeNull();
+
+    push.live({ status: 'live', pinnedProduct: null });
+    expect(screen.queryByText(/pinned by the host/i)).toBeNull();
+  });
+
+  it('ignores an invalid pinned handle', async () => {
+    const { push } = await openLive();
+    push.live({ status: 'live', pinnedProduct: '../../etc/passwd' });
+    expect(screen.queryByText(/pinned by the host/i)).toBeNull();
+  });
+
+  it('shows nothing when the pinned product cannot be loaded', async () => {
+    const store = hatStore();
+    const original = vi.mocked(store.getProduct).getMockImplementation()!;
+    vi.mocked(store.getProduct).mockImplementation(async (h) => {
+      if (h === 'ghost') throw new Error('404');
+      return original(h);
+    });
+    const { push } = await openLive(store);
+    push.live({ status: 'live', pinnedProduct: 'ghost' });
+    await vi.waitFor(() => expect(store.getProduct).toHaveBeenCalledWith('ghost'));
+    expect(screen.queryByText(/pinned by the host/i)).toBeNull();
+  });
+
+  it('adds the pinned product to the cart and tracks it against the video being watched', async () => {
+    const { push, store } = await openLive();
+    push.live({ status: 'live', pinnedProduct: 'hat' });
+    const pinned = (await screen.findByText(/pinned by the host/i)).closest('.pinned') as HTMLElement;
+    await userEvent.click(pinned.querySelector('.btn') as HTMLElement);
+
+    expect(store.addToCart).toHaveBeenCalledWith(expect.objectContaining({ handle: 'hat' }));
+    await vi.waitFor(() =>
+      expect(track).toHaveBeenCalledWith({ type: 'add_to_cart', videoId: 'v1', productHandle: 'hat', value: 35, currency: 'USD' }),
+    );
   });
 });

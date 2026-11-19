@@ -1,6 +1,7 @@
 export type TrackInput =
   | { type: 'view' | 'video_click' | 'story_open'; videoId: string }
   | { type: 'hotspot_click'; videoId: string; productHandle: string }
+  | { type: 'reaction'; videoId: string; count: number }
   | { type: 'add_to_cart'; videoId: string; productHandle: string; value: number; currency: string };
 
 export type Track = (event: TrackInput) => void;

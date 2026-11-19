@@ -21,6 +21,17 @@ describe('parseEvent', () => {
     expect(parseEvent({ ...base, type: 'hotspot_click', productHandle: 'a b' })).toBeNull();
   });
 
+  it('accepts a reaction batch with an integer count from 1 to 50', () => {
+    const r = { ...base, type: 'reaction', count: 12 };
+    expect(parseEvent({ ...r, productHandle: 'x', value: 3 })).toEqual(r);
+    expect(parseEvent({ ...r, count: 1 })).toEqual({ ...r, count: 1 });
+    expect(parseEvent({ ...r, count: 50 })).toEqual({ ...r, count: 50 });
+  });
+
+  it.each([0, -3, 51, 2.5, NaN, '5', undefined, Infinity])('rejects a reaction with count %p', (count) => {
+    expect(parseEvent({ ...base, type: 'reaction', count })).toBeNull();
+  });
+
   it('accepts a complete add_to_cart event', () => {
     expect(parseEvent(atc)).toEqual(atc);
   });
@@ -49,6 +60,7 @@ describe('COUNTER', () => {
       video_click: 'clicks',
       story_open: 'storyOpens',
       hotspot_click: 'hotspotClicks',
+      reaction: 'reactions',
       add_to_cart: 'addToCarts',
     });
   });

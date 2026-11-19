@@ -156,6 +156,7 @@ export function App({ embeddingId, onFail, loadConfig, store, track, connectLive
             markSeen(v.id);
           }}
           onHotspot={(v, handle) => track({ type: 'hotspot_click', videoId: v.id, productHandle: handle })}
+          onReaction={(v, count) => track({ type: 'reaction', videoId: v.id, count })}
           onAdded={(v, p) => {
             track({ type: 'add_to_cart', videoId: v.id, productHandle: p.handle, value: p.price, currency: p.currency });
             void emitCartAdd(p, cachedStore);

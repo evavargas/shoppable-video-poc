@@ -405,7 +405,8 @@
           "label": "Flatbreads"
         }
       ],
-      "status": "live"
+      "status": "live",
+      "pinnedProduct": "weekend-pastry-box"
     }
   }
 }

@@ -70,7 +70,8 @@ export const track = onRequest({ cors: true }, async (req, res) => {
     return;
   }
 
-  const stats: Record<string, unknown> = { [COUNTER[event.type]]: FieldValue.increment(1) };
+  // A reaction event stands for `count` hearts; every other event counts once.
+  const stats: Record<string, unknown> = { [COUNTER[event.type]]: FieldValue.increment(event.type === 'reaction' ? (event.count ?? 1) : 1) };
   if (event.type === 'add_to_cart') {
     stats.addToCartValue = FieldValue.increment(event.value ?? 0);
     stats.currency = event.currency; // PoC: assumes one currency per embedding

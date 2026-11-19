@@ -12,13 +12,13 @@ Last updated: 2026-11-19.
 | Feature 1: timed product hotspots (`hotspot_click`) | Done, **not deployed** | |
 | Feature 2: stories layout (`story_open`, progress bars) | Done, **not deployed** | |
 | Feature 3: floating live mini-player (`getLiveStatus`, `status` field) | Done, **not deployed** | |
-| Feature 4: live extras (viewer count, hearts, pinned product) | **Planned** (section 4) | |
-| Feature 5: gamified discount / secret item | **Planned** (section 5) | |
+| Feature 4: live extras (viewer count, hearts, pinned product) | Done, **not deployed** | Built as planned in section 4 (see the implementation notes there) |
+| Feature 5: gamified discount / secret item | **Planned** (section 5), next to build | |
 | Feature 6: upcoming live (countdown, "Remind me") | Outlined (section 6) | |
 | Feature 7: host control page + auth model + rules | Outlined (section 7) | |
 | Final deploy, README screenshots for 4 to 7 | Pending | |
 
-Numbers at the last check: widget **74.2 KB gzip** (`widget.js`), `live.js` 142.9 KB gzip (lazy), 56 widget tests + 26 function tests passing.
+Numbers at the last check: widget **75.3 KB gzip** (`widget.js`), `live.js` 143.2 KB gzip (lazy), 73 widget tests + 35 function tests passing.
 
 ### What production is missing (deploy checklist)
 
@@ -64,6 +64,14 @@ These are decisions taken earlier; keep them unless there is a reason.
 - **Process:** one feature at a time, then stop so it can be tested locally. Deploy only at the end.
 
 ## 4. Feature 4: live extras (viewer count, heart reactions, pinned product)
+
+> **Implemented.** The design below was followed. Differences and additions made while building it:
+> - `LiveApi.watchStatus` became `watchLive` (status + `pinnedProduct`), used by both the mini-player and the live panel.
+> - The viewers listener is capped at 100 documents (`orderBy lastSeen desc`, `limit(100)`) and the UI shows `100+` when full.
+> - Hearts also have a 2 s safety-net timer to remove them when no CSS animation runs (background tab, jsdom).
+> - The `reaction` event carries `count` (integer 1 to 50) and increments the `reactions` counter by that amount.
+> - Seed data pins `weekend-pastry-box` on `bakery-live` (the Shopify dev-store embedding shares this live room, so its pinned card stays empty because that handle doesn't exist there).
+> - Still missing from the plan: automated rules tests (now part of feature 7).
 
 Goal: make a live feel alive, with three small real-time features on top of the existing chat and poll. All three live in `live.js` (Firestore) and in the live panel of the player.
 
@@ -201,6 +209,7 @@ Goal: a tiny `/host.html`, clearly labeled **"PoC only, no real authentication"*
 - **GitHub Actions:** `actions/checkout@v4` and `actions/setup-node@v4` warn about Node 20 deprecation; bump to the current major versions.
 - **`track` is public and unthrottled:** accepts any embedding id. At scale: Pub/Sub in front, rate limits, App Check, signed embedding ids (already in the README's scale section).
 - **Pexels media in a public repo:** the license allows free use and modification but forbids redistribution on stock platforms. The files are trimmed and re-encoded and credited. If you prefer zero doubt, keep them out of git and only deploy them to Hosting.
+- **Production data:** seed data now includes `pinnedProduct` on `lives/bakery-live`; the next deploy must re-seed so production gets it, and must deploy the new Firestore rules (viewers, reactions).
 - **Real-device check:** swipe, tap targets and the native video controls were only tested with mobile emulation. Try an actual phone.
 - **Accessibility audit:** run axe on the store page, the player and the mini-player; test with VoiceOver.
 - **Performance measurement:** run Lighthouse / WebPageTest on the demo store to get real LCP and CLS numbers for the README (the layout-shift reasoning is documented, but not yet measured).
@@ -219,4 +228,4 @@ Goal: a tiny `/host.html`, clearly labeled **"PoC only, no real authentication"*
 
 Paste this at the start of the next session:
 
-> Context: repo `evavargas/shoppable-video-poc`. Read `README.md` and `docs/ROADMAP.md` first. Features 1 to 3 are built and pushed but not deployed. Implement **feature 4** exactly as planned in section 4 of the roadmap, one sub-feature at a time (4a viewer count, 4b hearts, 4c pinned product), stopping after each so I can test it locally. Follow section 3 (rules), add tests, keep CI green, update the README, report the new gzip sizes, and explain new concepts in simple words (I need to explain them in English in an interview). Do not deploy until I say so.
+> Context: repo `evavargas/shoppable-video-poc`. Read `README.md` and `docs/ROADMAP.md` first. Features 1 to 4 are built and pushed but not deployed. Implement **feature 5** exactly as planned in section 5 of the roadmap, stopping afterwards so I can test it locally. Follow section 3 (rules), add tests, keep CI green, update the README, report the new gzip sizes, and explain new concepts in simple words (I need to explain them in English in an interview). Do not deploy until I say so.
