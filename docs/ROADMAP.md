@@ -5,6 +5,9 @@ Last updated: 2026-11-19.
 
 ## 1. Where we are
 
+> **Newest change (deployed 2026-11-19): the demo store is now the Merece store.** It adopts the identity of the Merece bakery (light and dark themes, Merece type and colors, Spanish copy, its real catalog and UYU prices as Shopify-style products with options and variants, a cart drawer with delivery zones), and the widget gained CSS-variable theming, Spanish strings and a variant picker. Merece's own repo is untouched and nothing is synced. Details: [`docs/BRAND.md`](BRAND.md).
+> The Merece demo now uses the owner's own videos (7 clips, `widget/public/media/merece/videos/`, compressed from `inbox/merece-videos/`, which is git-ignored). To add more: trim to 8-30 s, 720p H.264 with a poster frame, add them to `videos` in `firebase/seed-data.json` and `firebase/prod-data.json`.
+
 | Step | Status | Notes |
 |---|---|---|
 | Base PoC (a to e): widget, Firestore config, Shopify cart, tracking, live chat + poll | Done and deployed | `terry-shop.web.app` |
@@ -26,9 +29,10 @@ Features 1 to 4 were deployed on 2026-11-19: new function `getLiveStatus`, new F
 
 Repeat this for every later feature, and **confirm before running it** (it publishes to the internet and writes to the real database):
 
+0. For the Merece store: `npm run build:products` regenerates the Shopify-style product files after editing `scripts/merece-catalog.json`.
 1. `npm run build -w widget && npm run build -w functions`
 2. `npx firebase deploy --project terry-shop --force`
-3. `GOOGLE_CLOUD_QUOTA_PROJECT=terry-shop node firebase/seed.mjs --project terry-shop --file firebase/prod-data.json` (it overwrites documents with the same ids)
+3. `GOOGLE_CLOUD_QUOTA_PROJECT=terry-shop node firebase/seed.mjs --project terry-shop --file firebase/prod-data.json` (it overwrites documents with the same ids; the seed now writes `merece-demo`, `merece-stories`, `merece-live` and `home-carousel`, plus the lives `merece-live` and `bakery-live`. It does NOT delete the old `demo-bakery`, `demo-stories` and `demo-live` documents already in production: remove them from the Firebase console)
 4. Check `https://terry-shop.web.app/api/liveStatus?id=bakery-live`, the dashboard, and the store page.
 
 Note: the dashboard counters in production also include events created by smoke tests.

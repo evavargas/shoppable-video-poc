@@ -1,4 +1,5 @@
 import { type FormEvent, useEffect, useRef, useState } from 'react';
+import { t } from '../i18n';
 import { HANDLE, HEARTBEAT_MS, countActive, formatWatching } from '../live-utils';
 import { sessionId } from '../track';
 import type { ChatMessage, LiveApi, Poll } from '../types';
@@ -98,10 +99,10 @@ export function Live({ liveId, connect, onPinned, onHearts, onReaction }: Props)
 
   function send(e: FormEvent) {
     e.preventDefault();
-    const t = text.trim();
-    if (!api || !t) return;
+    const body = text.trim(); // not named `t`: that is the translation function
+    if (!api || !body) return;
     setText('');
-    api.sendMessage(liveId, `Guest ${sessionId.slice(0, 4)}`, t).catch(() => setText(t));
+    api.sendMessage(liveId, `${t('guest')} ${sessionId.slice(0, 4)}`, body).catch(() => setText(body));
   }
 
   // Hearts are cheap to show and expensive to store: animate every tap at once, but write at most one batch per second.
@@ -125,12 +126,12 @@ export function Live({ liveId, connect, onPinned, onHearts, onReaction }: Props)
   const watching = viewerTimes ? formatWatching(countActive(viewerTimes, now), viewerTimes.length) : null;
 
   return (
-    <section className="live" aria-label="Live">
+    <section className="live" aria-label={t('liveRegion')}>
       <p className="live-title">
-        <span className="badge">LIVE</span>
+        <span className="badge">{t('live')}</span>
         {watching !== null && (
           <span className="watching" aria-live="off">
-            {watching} watching
+            {t('watching', { n: watching })}
           </span>
         )}
       </p>
@@ -153,7 +154,7 @@ export function Live({ liveId, connect, onPinned, onHearts, onReaction }: Props)
           </div>
         </div>
       )}
-      <ol className="chat" role="log" aria-live="polite" aria-label="Live chat">
+      <ol className="chat" role="log" aria-live="polite" aria-label={t('liveChat')}>
         {messages.map((m) => (
           <li key={m.id}>
             <strong>{m.name}:</strong> {m.text}
@@ -161,12 +162,12 @@ export function Live({ liveId, connect, onPinned, onHearts, onReaction }: Props)
         ))}
       </ol>
       <form className="chat-form" onSubmit={send}>
-        <input aria-label="Message" value={text} maxLength={200} onChange={(e) => setText(e.target.value)} placeholder="Say something…" />
-        <button type="button" className="heart-btn" aria-label="Send a heart" disabled={!api} onClick={sendHeart}>
+        <input aria-label={t('message')} value={text} maxLength={200} onChange={(e) => setText(e.target.value)} placeholder={t('saySomething')} />
+        <button type="button" className="heart-btn" aria-label={t('sendHeart')} disabled={!api} onClick={sendHeart}>
           ❤ <span aria-hidden="true">{heartTotal}</span>
         </button>
         <button type="submit" className="btn" disabled={!api}>
-          Send
+          {t('send')}
         </button>
       </form>
     </section>

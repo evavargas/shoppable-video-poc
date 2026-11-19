@@ -1,0 +1,27 @@
+{
+  "currency": "UYU",
+  "note": "Catalog of the Merece demo store (names, descriptions and prices captured from the public Merece site). Edit here, then run: npm run build:products",
+  "options": {
+    "glaze": { "name": "Glaseado", "values": ["Con glaseado", "Sin glaseado"] },
+    "serve": { "name": "Roll", "values": ["Caliente", "Frío"] },
+    "milk": { "name": "Leche", "values": ["Leche entera", "Deslactosada", "Vegetal (avena)"] },
+    "temp": { "name": "Temperatura", "values": ["Caliente", "Fría"] }
+  },
+  "products": [
+    { "handle": "combo-roll-cappu", "type": "combos", "title": "Combo Roll + Cappu", "price": 430, "image": "roll-de-canela", "description": "Un roll de canela y un cappuccino.", "options": ["glaze", "serve", "milk"] },
+    { "handle": "mini-cookies-cappu", "type": "combos", "title": "6 mini cookies + Cappu", "price": 350, "image": "pack-12-mini-cookies", "description": "6 mini cookies + cappuccino.", "options": ["milk"] },
+    { "handle": "roll-de-canela", "type": "postres", "title": "1 Roll de canela", "price": 250, "image": "roll-de-canela", "description": "Los clásicos y esponjosos.", "options": ["glaze", "serve"] },
+    { "handle": "pack-12-mini-cookies", "type": "postres", "title": "Pack 12 mini cookies", "price": 260, "image": "pack-12-mini-cookies", "description": "Clásicas, chocolate con chips de choco blanco y red velvet con chips de choco blanco." },
+    { "handle": "budin-marmolado", "type": "postres", "title": "Budín marmolado (500 gr)", "price": 380, "image": "budin-marmolado", "description": "Vainilla y chocolate." },
+    { "handle": "porcion-lemon-pie", "type": "postres", "title": "Porción Lemon Pie", "price": 260, "image": "porcion-lemon-pie", "description": "Con exquisito curd de limón y merengue italiano." },
+    { "handle": "porcion-brownie", "type": "postres", "title": "Porción brownie", "price": 240, "description": "Intensa, de chocolate.", "available": false },
+    { "handle": "pack-9-rolls-de-canela", "type": "postres", "title": "Pack 9 rolls de canela", "price": 1800, "image": "roll-de-canela", "description": "Nueve rolls para compartir.", "options": ["glaze", "serve"] },
+    { "handle": "espresso", "type": "bebidas", "title": "Espresso", "price": 100, "image": "espresso", "description": "36 g de café de especialidad." },
+    { "handle": "americano", "type": "bebidas", "title": "Americano", "price": 150, "image": "espresso", "description": "36 g de café + 150 ml de agua.", "options": ["temp"] },
+    { "handle": "cappuccino", "type": "bebidas", "title": "Cappuccino", "price": 220, "image": "cappuccino", "description": "1 shot de espresso + leche a elección.", "options": ["milk"] },
+    { "handle": "flat-white", "type": "bebidas", "title": "Flat white", "price": 220, "image": "cappuccino", "description": "2 shots de espresso + leche a elección.", "options": ["milk"] },
+    { "handle": "iced-latte", "type": "bebidas", "title": "Iced latte", "price": 250, "image": "iced-latte", "description": "1 shot de espresso + leche a elección + hielo.", "options": ["milk"] },
+    { "handle": "torta-lemon-pie", "type": "tortas", "title": "Lemon pie", "price": 1300, "image": "torta-lemon-pie", "description": "24 cm, 12 porciones. Con exquisito curd de limón y merengue italiano.", "advanceHours": 48 },
+    { "handle": "torta-brownie", "type": "tortas", "title": "Torta brownie", "price": 1400, "description": "9 porciones. Intensa, de chocolate.", "advanceHours": 48 }
+  ]
+}

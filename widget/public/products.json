@@ -1,0 +1,837 @@
+{
+ "currency": "UYU",
+ "products": [
+  {
+   "id": 7000,
+   "handle": "combo-roll-cappu",
+   "title": "Combo Roll + Cappu",
+   "description": "Un roll de canela y un cappuccino.",
+   "product_type": "combos",
+   "tags": [
+    "combos"
+   ],
+   "price": 43000,
+   "available": true,
+   "featured_image": "/media/merece/products/roll-de-canela.jpg",
+   "options": [
+    {
+     "name": "Glaseado",
+     "position": 1,
+     "values": [
+      "Con glaseado",
+      "Sin glaseado"
+     ]
+    },
+    {
+     "name": "Roll",
+     "position": 2,
+     "values": [
+      "Caliente",
+      "Frío"
+     ]
+    },
+    {
+     "name": "Leche",
+     "position": 3,
+     "values": [
+      "Leche entera",
+      "Deslactosada",
+      "Vegetal (avena)"
+     ]
+    }
+   ],
+   "variants": [
+    {
+     "id": 51000,
+     "title": "Con glaseado / Caliente / Leche entera",
+     "option1": "Con glaseado",
+     "option2": "Caliente",
+     "option3": "Leche entera",
+     "available": true,
+     "price": 43000,
+     "position": 1
+    },
+    {
+     "id": 51001,
+     "title": "Con glaseado / Caliente / Deslactosada",
+     "option1": "Con glaseado",
+     "option2": "Caliente",
+     "option3": "Deslactosada",
+     "available": true,
+     "price": 43000,
+     "position": 2
+    },
+    {
+     "id": 51002,
+     "title": "Con glaseado / Caliente / Vegetal (avena)",
+     "option1": "Con glaseado",
+     "option2": "Caliente",
+     "option3": "Vegetal (avena)",
+     "available": true,
+     "price": 43000,
+     "position": 3
+    },
+    {
+     "id": 51003,
+     "title": "Con glaseado / Frío / Leche entera",
+     "option1": "Con glaseado",
+     "option2": "Frío",
+     "option3": "Leche entera",
+     "available": true,
+     "price": 43000,
+     "position": 4
+    },
+    {
+     "id": 51004,
+     "title": "Con glaseado / Frío / Deslactosada",
+     "option1": "Con glaseado",
+     "option2": "Frío",
+     "option3": "Deslactosada",
+     "available": true,
+     "price": 43000,
+     "position": 5
+    },
+    {
+     "id": 51005,
+     "title": "Con glaseado / Frío / Vegetal (avena)",
+     "option1": "Con glaseado",
+     "option2": "Frío",
+     "option3": "Vegetal (avena)",
+     "available": true,
+     "price": 43000,
+     "position": 6
+    },
+    {
+     "id": 51006,
+     "title": "Sin glaseado / Caliente / Leche entera",
+     "option1": "Sin glaseado",
+     "option2": "Caliente",
+     "option3": "Leche entera",
+     "available": true,
+     "price": 43000,
+     "position": 7
+    },
+    {
+     "id": 51007,
+     "title": "Sin glaseado / Caliente / Deslactosada",
+     "option1": "Sin glaseado",
+     "option2": "Caliente",
+     "option3": "Deslactosada",
+     "available": true,
+     "price": 43000,
+     "position": 8
+    },
+    {
+     "id": 51008,
+     "title": "Sin glaseado / Caliente / Vegetal (avena)",
+     "option1": "Sin glaseado",
+     "option2": "Caliente",
+     "option3": "Vegetal (avena)",
+     "available": true,
+     "price": 43000,
+     "position": 9
+    },
+    {
+     "id": 51009,
+     "title": "Sin glaseado / Frío / Leche entera",
+     "option1": "Sin glaseado",
+     "option2": "Frío",
+     "option3": "Leche entera",
+     "available": true,
+     "price": 43000,
+     "position": 10
+    },
+    {
+     "id": 51010,
+     "title": "Sin glaseado / Frío / Deslactosada",
+     "option1": "Sin glaseado",
+     "option2": "Frío",
+     "option3": "Deslactosada",
+     "available": true,
+     "price": 43000,
+     "position": 11
+    },
+    {
+     "id": 51011,
+     "title": "Sin glaseado / Frío / Vegetal (avena)",
+     "option1": "Sin glaseado",
+     "option2": "Frío",
+     "option3": "Vegetal (avena)",
+     "available": true,
+     "price": 43000,
+     "position": 12
+    }
+   ],
+   "position": 1
+  },
+  {
+   "id": 7001,
+   "handle": "mini-cookies-cappu",
+   "title": "6 mini cookies + Cappu",
+   "description": "6 mini cookies + cappuccino.",
+   "product_type": "combos",
+   "tags": [
+    "combos"
+   ],
+   "price": 35000,
+   "available": true,
+   "featured_image": "/media/merece/products/pack-12-mini-cookies.jpg",
+   "options": [
+    {
+     "name": "Leche",
+     "position": 1,
+     "values": [
+      "Leche entera",
+      "Deslactosada",
+      "Vegetal (avena)"
+     ]
+    }
+   ],
+   "variants": [
+    {
+     "id": 51012,
+     "title": "Leche entera",
+     "option1": "Leche entera",
+     "option2": null,
+     "option3": null,
+     "available": true,
+     "price": 35000,
+     "position": 1
+    },
+    {
+     "id": 51013,
+     "title": "Deslactosada",
+     "option1": "Deslactosada",
+     "option2": null,
+     "option3": null,
+     "available": true,
+     "price": 35000,
+     "position": 2
+    },
+    {
+     "id": 51014,
+     "title": "Vegetal (avena)",
+     "option1": "Vegetal (avena)",
+     "option2": null,
+     "option3": null,
+     "available": true,
+     "price": 35000,
+     "position": 3
+    }
+   ],
+   "position": 2
+  },
+  {
+   "id": 7002,
+   "handle": "roll-de-canela",
+   "title": "1 Roll de canela",
+   "description": "Los clásicos y esponjosos.",
+   "product_type": "postres",
+   "tags": [
+    "postres"
+   ],
+   "price": 25000,
+   "available": true,
+   "featured_image": "/media/merece/products/roll-de-canela.jpg",
+   "options": [
+    {
+     "name": "Glaseado",
+     "position": 1,
+     "values": [
+      "Con glaseado",
+      "Sin glaseado"
+     ]
+    },
+    {
+     "name": "Roll",
+     "position": 2,
+     "values": [
+      "Caliente",
+      "Frío"
+     ]
+    }
+   ],
+   "variants": [
+    {
+     "id": 51015,
+     "title": "Con glaseado / Caliente",
+     "option1": "Con glaseado",
+     "option2": "Caliente",
+     "option3": null,
+     "available": true,
+     "price": 25000,
+     "position": 1
+    },
+    {
+     "id": 51016,
+     "title": "Con glaseado / Frío",
+     "option1": "Con glaseado",
+     "option2": "Frío",
+     "option3": null,
+     "available": true,
+     "price": 25000,
+     "position": 2
+    },
+    {
+     "id": 51017,
+     "title": "Sin glaseado / Caliente",
+     "option1": "Sin glaseado",
+     "option2": "Caliente",
+     "option3": null,
+     "available": true,
+     "price": 25000,
+     "position": 3
+    },
+    {
+     "id": 51018,
+     "title": "Sin glaseado / Frío",
+     "option1": "Sin glaseado",
+     "option2": "Frío",
+     "option3": null,
+     "available": true,
+     "price": 25000,
+     "position": 4
+    }
+   ],
+   "position": 3
+  },
+  {
+   "id": 7003,
+   "handle": "pack-12-mini-cookies",
+   "title": "Pack 12 mini cookies",
+   "description": "Clásicas, chocolate con chips de choco blanco y red velvet con chips de choco blanco.",
+   "product_type": "postres",
+   "tags": [
+    "postres"
+   ],
+   "price": 26000,
+   "available": true,
+   "featured_image": "/media/merece/products/pack-12-mini-cookies.jpg",
+   "options": [
+    {
+     "name": "Title",
+     "position": 1,
+     "values": [
+      "Default Title"
+     ]
+    }
+   ],
+   "variants": [
+    {
+     "id": 51019,
+     "title": "Default Title",
+     "option1": null,
+     "option2": null,
+     "option3": null,
+     "available": true,
+     "price": 26000,
+     "position": 1
+    }
+   ],
+   "position": 4
+  },
+  {
+   "id": 7004,
+   "handle": "budin-marmolado",
+   "title": "Budín marmolado (500 gr)",
+   "description": "Vainilla y chocolate.",
+   "product_type": "postres",
+   "tags": [
+    "postres"
+   ],
+   "price": 38000,
+   "available": true,
+   "featured_image": "/media/merece/products/budin-marmolado.jpg",
+   "options": [
+    {
+     "name": "Title",
+     "position": 1,
+     "values": [
+      "Default Title"
+     ]
+    }
+   ],
+   "variants": [
+    {
+     "id": 51020,
+     "title": "Default Title",
+     "option1": null,
+     "option2": null,
+     "option3": null,
+     "available": true,
+     "price": 38000,
+     "position": 1
+    }
+   ],
+   "position": 5
+  },
+  {
+   "id": 7005,
+   "handle": "porcion-lemon-pie",
+   "title": "Porción Lemon Pie",
+   "description": "Con exquisito curd de limón y merengue italiano.",
+   "product_type": "postres",
+   "tags": [
+    "postres"
+   ],
+   "price": 26000,
+   "available": true,
+   "featured_image": "/media/merece/products/porcion-lemon-pie.jpg",
+   "options": [
+    {
+     "name": "Title",
+     "position": 1,
+     "values": [
+      "Default Title"
+     ]
+    }
+   ],
+   "variants": [
+    {
+     "id": 51021,
+     "title": "Default Title",
+     "option1": null,
+     "option2": null,
+     "option3": null,
+     "available": true,
+     "price": 26000,
+     "position": 1
+    }
+   ],
+   "position": 6
+  },
+  {
+   "id": 7006,
+   "handle": "porcion-brownie",
+   "title": "Porción brownie",
+   "description": "Intensa, de chocolate.",
+   "product_type": "postres",
+   "tags": [
+    "postres"
+   ],
+   "price": 24000,
+   "available": false,
+   "featured_image": null,
+   "options": [
+    {
+     "name": "Title",
+     "position": 1,
+     "values": [
+      "Default Title"
+     ]
+    }
+   ],
+   "variants": [
+    {
+     "id": 51022,
+     "title": "Default Title",
+     "option1": null,
+     "option2": null,
+     "option3": null,
+     "available": false,
+     "price": 24000,
+     "position": 1
+    }
+   ],
+   "position": 7
+  },
+  {
+   "id": 7007,
+   "handle": "pack-9-rolls-de-canela",
+   "title": "Pack 9 rolls de canela",
+   "description": "Nueve rolls para compartir.",
+   "product_type": "postres",
+   "tags": [
+    "postres"
+   ],
+   "price": 180000,
+   "available": true,
+   "featured_image": "/media/merece/products/roll-de-canela.jpg",
+   "options": [
+    {
+     "name": "Glaseado",
+     "position": 1,
+     "values": [
+      "Con glaseado",
+      "Sin glaseado"
+     ]
+    },
+    {
+     "name": "Roll",
+     "position": 2,
+     "values": [
+      "Caliente",
+      "Frío"
+     ]
+    }
+   ],
+   "variants": [
+    {
+     "id": 51023,
+     "title": "Con glaseado / Caliente",
+     "option1": "Con glaseado",
+     "option2": "Caliente",
+     "option3": null,
+     "available": true,
+     "price": 180000,
+     "position": 1
+    },
+    {
+     "id": 51024,
+     "title": "Con glaseado / Frío",
+     "option1": "Con glaseado",
+     "option2": "Frío",
+     "option3": null,
+     "available": true,
+     "price": 180000,
+     "position": 2
+    },
+    {
+     "id": 51025,
+     "title": "Sin glaseado / Caliente",
+     "option1": "Sin glaseado",
+     "option2": "Caliente",
+     "option3": null,
+     "available": true,
+     "price": 180000,
+     "position": 3
+    },
+    {
+     "id": 51026,
+     "title": "Sin glaseado / Frío",
+     "option1": "Sin glaseado",
+     "option2": "Frío",
+     "option3": null,
+     "available": true,
+     "price": 180000,
+     "position": 4
+    }
+   ],
+   "position": 8
+  },
+  {
+   "id": 7008,
+   "handle": "espresso",
+   "title": "Espresso",
+   "description": "36 g de café de especialidad.",
+   "product_type": "bebidas",
+   "tags": [
+    "bebidas"
+   ],
+   "price": 10000,
+   "available": true,
+   "featured_image": "/media/merece/products/espresso.jpg",
+   "options": [
+    {
+     "name": "Title",
+     "position": 1,
+     "values": [
+      "Default Title"
+     ]
+    }
+   ],
+   "variants": [
+    {
+     "id": 51027,
+     "title": "Default Title",
+     "option1": null,
+     "option2": null,
+     "option3": null,
+     "available": true,
+     "price": 10000,
+     "position": 1
+    }
+   ],
+   "position": 9
+  },
+  {
+   "id": 7009,
+   "handle": "americano",
+   "title": "Americano",
+   "description": "36 g de café + 150 ml de agua.",
+   "product_type": "bebidas",
+   "tags": [
+    "bebidas"
+   ],
+   "price": 15000,
+   "available": true,
+   "featured_image": "/media/merece/products/espresso.jpg",
+   "options": [
+    {
+     "name": "Temperatura",
+     "position": 1,
+     "values": [
+      "Caliente",
+      "Fría"
+     ]
+    }
+   ],
+   "variants": [
+    {
+     "id": 51028,
+     "title": "Caliente",
+     "option1": "Caliente",
+     "option2": null,
+     "option3": null,
+     "available": true,
+     "price": 15000,
+     "position": 1
+    },
+    {
+     "id": 51029,
+     "title": "Fría",
+     "option1": "Fría",
+     "option2": null,
+     "option3": null,
+     "available": true,
+     "price": 15000,
+     "position": 2
+    }
+   ],
+   "position": 10
+  },
+  {
+   "id": 7010,
+   "handle": "cappuccino",
+   "title": "Cappuccino",
+   "description": "1 shot de espresso + leche a elección.",
+   "product_type": "bebidas",
+   "tags": [
+    "bebidas"
+   ],
+   "price": 22000,
+   "available": true,
+   "featured_image": "/media/merece/products/cappuccino.jpg",
+   "options": [
+    {
+     "name": "Leche",
+     "position": 1,
+     "values": [
+      "Leche entera",
+      "Deslactosada",
+      "Vegetal (avena)"
+     ]
+    }
+   ],
+   "variants": [
+    {
+     "id": 51030,
+     "title": "Leche entera",
+     "option1": "Leche entera",
+     "option2": null,
+     "option3": null,
+     "available": true,
+     "price": 22000,
+     "position": 1
+    },
+    {
+     "id": 51031,
+     "title": "Deslactosada",
+     "option1": "Deslactosada",
+     "option2": null,
+     "option3": null,
+     "available": true,
+     "price": 22000,
+     "position": 2
+    },
+    {
+     "id": 51032,
+     "title": "Vegetal (avena)",
+     "option1": "Vegetal (avena)",
+     "option2": null,
+     "option3": null,
+     "available": true,
+     "price": 22000,
+     "position": 3
+    }
+   ],
+   "position": 11
+  },
+  {
+   "id": 7011,
+   "handle": "flat-white",
+   "title": "Flat white",
+   "description": "2 shots de espresso + leche a elección.",
+   "product_type": "bebidas",
+   "tags": [
+    "bebidas"
+   ],
+   "price": 22000,
+   "available": true,
+   "featured_image": "/media/merece/products/cappuccino.jpg",
+   "options": [
+    {
+     "name": "Leche",
+     "position": 1,
+     "values": [
+      "Leche entera",
+      "Deslactosada",
+      "Vegetal (avena)"
+     ]
+    }
+   ],
+   "variants": [
+    {
+     "id": 51033,
+     "title": "Leche entera",
+     "option1": "Leche entera",
+     "option2": null,
+     "option3": null,
+     "available": true,
+     "price": 22000,
+     "position": 1
+    },
+    {
+     "id": 51034,
+     "title": "Deslactosada",
+     "option1": "Deslactosada",
+     "option2": null,
+     "option3": null,
+     "available": true,
+     "price": 22000,
+     "position": 2
+    },
+    {
+     "id": 51035,
+     "title": "Vegetal (avena)",
+     "option1": "Vegetal (avena)",
+     "option2": null,
+     "option3": null,
+     "available": true,
+     "price": 22000,
+     "position": 3
+    }
+   ],
+   "position": 12
+  },
+  {
+   "id": 7012,
+   "handle": "iced-latte",
+   "title": "Iced latte",
+   "description": "1 shot de espresso + leche a elección + hielo.",
+   "product_type": "bebidas",
+   "tags": [
+    "bebidas"
+   ],
+   "price": 25000,
+   "available": true,
+   "featured_image": "/media/merece/products/iced-latte.jpg",
+   "options": [
+    {
+     "name": "Leche",
+     "position": 1,
+     "values": [
+      "Leche entera",
+      "Deslactosada",
+      "Vegetal (avena)"
+     ]
+    }
+   ],
+   "variants": [
+    {
+     "id": 51036,
+     "title": "Leche entera",
+     "option1": "Leche entera",
+     "option2": null,
+     "option3": null,
+     "available": true,
+     "price": 25000,
+     "position": 1
+    },
+    {
+     "id": 51037,
+     "title": "Deslactosada",
+     "option1": "Deslactosada",
+     "option2": null,
+     "option3": null,
+     "available": true,
+     "price": 25000,
+     "position": 2
+    },
+    {
+     "id": 51038,
+     "title": "Vegetal (avena)",
+     "option1": "Vegetal (avena)",
+     "option2": null,
+     "option3": null,
+     "available": true,
+     "price": 25000,
+     "position": 3
+    }
+   ],
+   "position": 13
+  },
+  {
+   "id": 7013,
+   "handle": "torta-lemon-pie",
+   "title": "Lemon pie",
+   "description": "24 cm, 12 porciones. Con exquisito curd de limón y merengue italiano.",
+   "product_type": "tortas",
+   "tags": [
+    "tortas",
+    "anticipacion-48h"
+   ],
+   "price": 130000,
+   "available": true,
+   "featured_image": "/media/merece/products/torta-lemon-pie.jpg",
+   "options": [
+    {
+     "name": "Title",
+     "position": 1,
+     "values": [
+      "Default Title"
+     ]
+    }
+   ],
+   "variants": [
+    {
+     "id": 51039,
+     "title": "Default Title",
+     "option1": null,
+     "option2": null,
+     "option3": null,
+     "available": true,
+     "price": 130000,
+     "position": 1
+    }
+   ],
+   "position": 14
+  },
+  {
+   "id": 7014,
+   "handle": "torta-brownie",
+   "title": "Torta brownie",
+   "description": "9 porciones. Intensa, de chocolate.",
+   "product_type": "tortas",
+   "tags": [
+    "tortas",
+    "anticipacion-48h"
+   ],
+   "price": 140000,
+   "available": true,
+   "featured_image": null,
+   "options": [
+    {
+     "name": "Title",
+     "position": 1,
+     "values": [
+      "Default Title"
+     ]
+    }
+   ],
+   "variants": [
+    {
+     "id": 51040,
+     "title": "Default Title",
+     "option1": null,
+     "option2": null,
+     "option3": null,
+     "available": true,
+     "price": 140000,
+     "position": 1
+    }
+   ],
+   "position": 15
+  }
+ ]
+}

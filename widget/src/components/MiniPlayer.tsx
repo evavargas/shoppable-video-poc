@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { prefersReducedMotion } from '../format';
+import { t } from '../i18n';
 import type { LiveApi, Video } from '../types';
 
 const read = (key: string) => {
@@ -92,16 +93,16 @@ export function MiniPlayer({ embeddingId, videos, fetchLiveStatus, connectLive, 
   }
 
   return (
-    <div className="mini" role="complementary" aria-label="Live now">
-      <button type="button" className="mini-open" aria-label={`Watch live: ${video.title}`} onClick={() => onOpen(index)}>
+    <div className="mini" role="complementary" aria-label={t('liveNow')}>
+      <button type="button" className="mini-open" aria-label={t('watchLive', { title: video.title })} onClick={() => onOpen(index)}>
         <video src={video.src} poster={video.poster} muted loop playsInline autoPlay={!prefersReducedMotion()} />
         <span className="live-pill" aria-hidden="true">
           <span className="dot" />
-          LIVE
+          {t('live')}
         </span>
         <span className="mini-title">{video.title}</span>
       </button>
-      <button type="button" className="mini-close" aria-label="Dismiss live video" onClick={dismiss}>
+      <button type="button" className="mini-close" aria-label={t('dismissLive')} onClick={dismiss}>
         ✕
       </button>
     </div>

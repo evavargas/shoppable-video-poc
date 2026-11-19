@@ -1,111 +1,5 @@
 {
   "embeds": {
-    "demo-bakery": {
-      "theme": {
-        "accent": "#9a3412"
-      },
-      "videos": [
-        {
-          "id": "v1",
-          "title": "Pour-over, the slow way",
-          "src": "/media/coffee-pour.mp4",
-          "poster": "/media/coffee-pour.jpg",
-          "productHandles": [
-            "house-blend-coffee"
-          ],
-          "hotspots": [
-            {
-              "handle": "house-blend-coffee",
-              "start": 1.5,
-              "end": 10,
-              "x": 52,
-              "y": 58
-            }
-          ]
-        },
-        {
-          "id": "v2",
-          "title": "Chocolate croissant, dipped",
-          "src": "/media/choco-croissant.mp4",
-          "poster": "/media/choco-croissant.jpg",
-          "productHandles": [
-            "chocolate-croissant"
-          ],
-          "hotspots": [
-            {
-              "handle": "chocolate-croissant",
-              "start": 0.8,
-              "end": 6.8,
-              "x": 50,
-              "y": 45
-            }
-          ]
-        },
-        {
-          "id": "v3",
-          "title": "Inside our pastry case",
-          "src": "/media/pastry-case.mp4",
-          "poster": "/media/pastry-case.jpg",
-          "productHandles": [
-            "weekend-pastry-box",
-            "chocolate-croissant"
-          ],
-          "hotspots": [
-            {
-              "handle": "chocolate-croissant",
-              "start": 1,
-              "end": 9,
-              "x": 33,
-              "y": 48
-            },
-            {
-              "handle": "weekend-pastry-box",
-              "start": 3,
-              "end": 10,
-              "x": 62,
-              "y": 76
-            }
-          ]
-        },
-        {
-          "id": "v4",
-          "title": "Shaping flatbreads by hand",
-          "src": "/media/dough-roll.mp4",
-          "poster": "/media/dough-roll.jpg",
-          "productHandles": [
-            "rustic-flatbreads"
-          ],
-          "hotspots": [
-            {
-              "handle": "rustic-flatbreads",
-              "start": 2,
-              "end": 11,
-              "x": 57,
-              "y": 58
-            }
-          ]
-        },
-        {
-          "id": "v5",
-          "title": "Live: sourdough Saturday",
-          "src": "/media/sourdough-knead.mp4",
-          "poster": "/media/sourdough-knead.jpg",
-          "productHandles": [
-            "country-sourdough"
-          ],
-          "liveId": "bakery-live",
-          "hotspots": [
-            {
-              "handle": "country-sourdough",
-              "start": 1.5,
-              "end": 11,
-              "x": 47,
-              "y": 26
-            }
-          ]
-        }
-      ]
-    },
     "home-carousel": {
       "theme": {
         "accent": "#9a3412"
@@ -168,224 +62,556 @@
         }
       ]
     },
-    "demo-stories": {
+    "merece-demo": {
       "theme": {
-        "accent": "#9a3412"
+        "accent": "#3d2825"
       },
       "videos": [
         {
           "id": "v1",
-          "title": "Pour-over, the slow way",
-          "src": "/media/coffee-pour.mp4",
-          "poster": "/media/coffee-pour.jpg",
+          "title": "En vivo: armando los rolls",
+          "label": "En vivo",
+          "src": "/media/merece/videos/en-vivo.mp4",
+          "poster": "/media/merece/videos/en-vivo.jpg",
           "productHandles": [
-            "house-blend-coffee"
+            "roll-de-canela",
+            "pack-9-rolls-de-canela"
           ],
           "hotspots": [
             {
-              "handle": "house-blend-coffee",
-              "start": 1.5,
-              "end": 10,
-              "x": 52,
-              "y": 58
+              "handle": "roll-de-canela",
+              "start": 2,
+              "end": 28,
+              "x": 35,
+              "y": 68
             }
           ],
-          "label": "Pour-over"
+          "liveId": "merece-live"
         },
         {
           "id": "v2",
-          "title": "Chocolate croissant, dipped",
-          "src": "/media/choco-croissant.mp4",
-          "poster": "/media/choco-croissant.jpg",
+          "title": "Rolls de canela, recién hechos",
+          "label": "Rolls",
+          "src": "/media/merece/videos/roll-de-canela.mp4",
+          "poster": "/media/merece/videos/roll-de-canela.jpg",
           "productHandles": [
-            "chocolate-croissant"
+            "roll-de-canela",
+            "pack-9-rolls-de-canela",
+            "combo-roll-cappu"
           ],
           "hotspots": [
             {
-              "handle": "chocolate-croissant",
-              "start": 0.8,
-              "end": 6.8,
+              "handle": "roll-de-canela",
+              "start": 1,
+              "end": 14,
               "x": 50,
-              "y": 45
+              "y": 60
+            },
+            {
+              "handle": "pack-9-rolls-de-canela",
+              "start": 4,
+              "end": 14,
+              "x": 60,
+              "y": 38
             }
-          ],
-          "label": "Croissant"
+          ]
         },
         {
           "id": "v3",
-          "title": "Inside our pastry case",
-          "src": "/media/pastry-case.mp4",
-          "poster": "/media/pastry-case.jpg",
+          "title": "Café de especialidad",
+          "label": "Café",
+          "src": "/media/merece/videos/cappuccino.mp4",
+          "poster": "/media/merece/videos/cappuccino.jpg",
           "productHandles": [
-            "weekend-pastry-box",
-            "chocolate-croissant"
+            "cappuccino",
+            "espresso"
           ],
           "hotspots": [
             {
-              "handle": "chocolate-croissant",
-              "start": 1,
-              "end": 9,
-              "x": 33,
-              "y": 48
+              "handle": "cappuccino",
+              "start": 1.5,
+              "end": 14,
+              "x": 45,
+              "y": 78
             },
             {
-              "handle": "weekend-pastry-box",
+              "handle": "espresso",
               "start": 3,
-              "end": 10,
-              "x": 62,
-              "y": 76
+              "end": 14,
+              "x": 50,
+              "y": 40
             }
-          ],
-          "label": "Pastry case"
+          ]
         },
         {
           "id": "v4",
-          "title": "Shaping flatbreads by hand",
-          "src": "/media/dough-roll.mp4",
-          "poster": "/media/dough-roll.jpg",
+          "title": "Lemon pie con merengue",
+          "label": "Lemon pie",
+          "src": "/media/merece/videos/lemon-pie.mp4",
+          "poster": "/media/merece/videos/lemon-pie.jpg",
           "productHandles": [
-            "rustic-flatbreads"
+            "porcion-lemon-pie",
+            "torta-lemon-pie"
           ],
           "hotspots": [
             {
-              "handle": "rustic-flatbreads",
-              "start": 2,
-              "end": 11,
-              "x": 57,
-              "y": 58
+              "handle": "porcion-lemon-pie",
+              "start": 1,
+              "end": 10,
+              "x": 50,
+              "y": 45
+            },
+            {
+              "handle": "torta-lemon-pie",
+              "start": 3,
+              "end": 10,
+              "x": 40,
+              "y": 72
             }
-          ],
-          "label": "Flatbreads"
+          ]
         },
         {
           "id": "v5",
-          "title": "Live: sourdough Saturday",
-          "src": "/media/sourdough-knead.mp4",
-          "poster": "/media/sourdough-knead.jpg",
+          "title": "Armando el pack de mini cookies",
+          "label": "Cookies",
+          "src": "/media/merece/videos/pack-12-mini-cookies.mp4",
+          "poster": "/media/merece/videos/pack-12-mini-cookies.jpg",
           "productHandles": [
-            "country-sourdough"
+            "pack-12-mini-cookies",
+            "mini-cookies-cappu"
           ],
-          "liveId": "bakery-live",
           "hotspots": [
             {
-              "handle": "country-sourdough",
-              "start": 1.5,
-              "end": 11,
-              "x": 47,
-              "y": 26
+              "handle": "pack-12-mini-cookies",
+              "start": 1,
+              "end": 15,
+              "x": 60,
+              "y": 70
+            },
+            {
+              "handle": "mini-cookies-cappu",
+              "start": 4,
+              "end": 15,
+              "x": 45,
+              "y": 38
             }
+          ]
+        },
+        {
+          "id": "v6",
+          "title": "Budín marmolado",
+          "label": "Budín",
+          "src": "/media/merece/videos/budin-marmolado.mp4",
+          "poster": "/media/merece/videos/budin-marmolado.jpg",
+          "productHandles": [
+            "budin-marmolado"
           ],
-          "label": "Live bake"
+          "hotspots": [
+            {
+              "handle": "budin-marmolado",
+              "start": 1,
+              "end": 7,
+              "x": 50,
+              "y": 50
+            }
+          ]
+        },
+        {
+          "id": "v7",
+          "title": "Torta brownie a pedido",
+          "label": "Brownie",
+          "src": "/media/merece/videos/torta-brownie.mp4",
+          "poster": "/media/merece/videos/torta-brownie.jpg",
+          "productHandles": [
+            "torta-brownie",
+            "porcion-brownie"
+          ],
+          "hotspots": [
+            {
+              "handle": "torta-brownie",
+              "start": 1,
+              "end": 8,
+              "x": 50,
+              "y": 45
+            },
+            {
+              "handle": "porcion-brownie",
+              "start": 3,
+              "end": 8,
+              "x": 55,
+              "y": 78
+            }
+          ]
         }
-      ],
-      "layout": "stories"
+      ]
     },
-    "demo-live": {
+    "merece-stories": {
       "theme": {
-        "accent": "#9a3412"
+        "accent": "#3d2825"
       },
+      "layout": "stories",
       "videos": [
         {
           "id": "v1",
-          "title": "Pour-over, the slow way",
-          "src": "/media/coffee-pour.mp4",
-          "poster": "/media/coffee-pour.jpg",
+          "title": "En vivo: armando los rolls",
+          "label": "En vivo",
+          "src": "/media/merece/videos/en-vivo.mp4",
+          "poster": "/media/merece/videos/en-vivo.jpg",
           "productHandles": [
-            "house-blend-coffee"
+            "roll-de-canela",
+            "pack-9-rolls-de-canela"
           ],
           "hotspots": [
             {
-              "handle": "house-blend-coffee",
-              "start": 1.5,
-              "end": 10,
-              "x": 52,
-              "y": 58
+              "handle": "roll-de-canela",
+              "start": 2,
+              "end": 28,
+              "x": 35,
+              "y": 68
             }
-          ]
+          ],
+          "liveId": "merece-live"
         },
         {
           "id": "v2",
-          "title": "Chocolate croissant, dipped",
-          "src": "/media/choco-croissant.mp4",
-          "poster": "/media/choco-croissant.jpg",
+          "title": "Rolls de canela, recién hechos",
+          "label": "Rolls",
+          "src": "/media/merece/videos/roll-de-canela.mp4",
+          "poster": "/media/merece/videos/roll-de-canela.jpg",
           "productHandles": [
-            "chocolate-croissant"
+            "roll-de-canela",
+            "pack-9-rolls-de-canela",
+            "combo-roll-cappu"
           ],
           "hotspots": [
             {
-              "handle": "chocolate-croissant",
-              "start": 0.8,
-              "end": 6.8,
+              "handle": "roll-de-canela",
+              "start": 1,
+              "end": 14,
               "x": 50,
-              "y": 45
+              "y": 60
+            },
+            {
+              "handle": "pack-9-rolls-de-canela",
+              "start": 4,
+              "end": 14,
+              "x": 60,
+              "y": 38
             }
           ]
         },
         {
           "id": "v3",
-          "title": "Inside our pastry case",
-          "src": "/media/pastry-case.mp4",
-          "poster": "/media/pastry-case.jpg",
+          "title": "Café de especialidad",
+          "label": "Café",
+          "src": "/media/merece/videos/cappuccino.mp4",
+          "poster": "/media/merece/videos/cappuccino.jpg",
           "productHandles": [
-            "weekend-pastry-box",
-            "chocolate-croissant"
+            "cappuccino",
+            "espresso"
           ],
           "hotspots": [
             {
-              "handle": "chocolate-croissant",
-              "start": 1,
-              "end": 9,
-              "x": 33,
-              "y": 48
+              "handle": "cappuccino",
+              "start": 1.5,
+              "end": 14,
+              "x": 45,
+              "y": 78
             },
             {
-              "handle": "weekend-pastry-box",
+              "handle": "espresso",
               "start": 3,
-              "end": 10,
-              "x": 62,
-              "y": 76
+              "end": 14,
+              "x": 50,
+              "y": 40
             }
           ]
         },
         {
           "id": "v4",
-          "title": "Shaping flatbreads by hand",
-          "src": "/media/dough-roll.mp4",
-          "poster": "/media/dough-roll.jpg",
+          "title": "Lemon pie con merengue",
+          "label": "Lemon pie",
+          "src": "/media/merece/videos/lemon-pie.mp4",
+          "poster": "/media/merece/videos/lemon-pie.jpg",
           "productHandles": [
-            "rustic-flatbreads"
+            "porcion-lemon-pie",
+            "torta-lemon-pie"
           ],
           "hotspots": [
             {
-              "handle": "rustic-flatbreads",
-              "start": 2,
-              "end": 11,
-              "x": 57,
-              "y": 58
+              "handle": "porcion-lemon-pie",
+              "start": 1,
+              "end": 10,
+              "x": 50,
+              "y": 45
+            },
+            {
+              "handle": "torta-lemon-pie",
+              "start": 3,
+              "end": 10,
+              "x": 40,
+              "y": 72
             }
           ]
         },
         {
           "id": "v5",
-          "title": "Live: sourdough Saturday",
-          "src": "/media/sourdough-knead.mp4",
-          "poster": "/media/sourdough-knead.jpg",
+          "title": "Armando el pack de mini cookies",
+          "label": "Cookies",
+          "src": "/media/merece/videos/pack-12-mini-cookies.mp4",
+          "poster": "/media/merece/videos/pack-12-mini-cookies.jpg",
           "productHandles": [
-            "country-sourdough"
+            "pack-12-mini-cookies",
+            "mini-cookies-cappu"
           ],
-          "liveId": "bakery-live",
           "hotspots": [
             {
-              "handle": "country-sourdough",
-              "start": 1.5,
-              "end": 11,
-              "x": 47,
-              "y": 26
+              "handle": "pack-12-mini-cookies",
+              "start": 1,
+              "end": 15,
+              "x": 60,
+              "y": 70
+            },
+            {
+              "handle": "mini-cookies-cappu",
+              "start": 4,
+              "end": 15,
+              "x": 45,
+              "y": 38
+            }
+          ]
+        },
+        {
+          "id": "v6",
+          "title": "Budín marmolado",
+          "label": "Budín",
+          "src": "/media/merece/videos/budin-marmolado.mp4",
+          "poster": "/media/merece/videos/budin-marmolado.jpg",
+          "productHandles": [
+            "budin-marmolado"
+          ],
+          "hotspots": [
+            {
+              "handle": "budin-marmolado",
+              "start": 1,
+              "end": 7,
+              "x": 50,
+              "y": 50
+            }
+          ]
+        },
+        {
+          "id": "v7",
+          "title": "Torta brownie a pedido",
+          "label": "Brownie",
+          "src": "/media/merece/videos/torta-brownie.mp4",
+          "poster": "/media/merece/videos/torta-brownie.jpg",
+          "productHandles": [
+            "torta-brownie",
+            "porcion-brownie"
+          ],
+          "hotspots": [
+            {
+              "handle": "torta-brownie",
+              "start": 1,
+              "end": 8,
+              "x": 50,
+              "y": 45
+            },
+            {
+              "handle": "porcion-brownie",
+              "start": 3,
+              "end": 8,
+              "x": 55,
+              "y": 78
             }
           ]
         }
-      ],
-      "layout": "floating"
+      ]
+    },
+    "merece-live": {
+      "theme": {
+        "accent": "#3d2825"
+      },
+      "layout": "floating",
+      "videos": [
+        {
+          "id": "v1",
+          "title": "En vivo: armando los rolls",
+          "label": "En vivo",
+          "src": "/media/merece/videos/en-vivo.mp4",
+          "poster": "/media/merece/videos/en-vivo.jpg",
+          "productHandles": [
+            "roll-de-canela",
+            "pack-9-rolls-de-canela"
+          ],
+          "hotspots": [
+            {
+              "handle": "roll-de-canela",
+              "start": 2,
+              "end": 28,
+              "x": 35,
+              "y": 68
+            }
+          ],
+          "liveId": "merece-live"
+        },
+        {
+          "id": "v2",
+          "title": "Rolls de canela, recién hechos",
+          "label": "Rolls",
+          "src": "/media/merece/videos/roll-de-canela.mp4",
+          "poster": "/media/merece/videos/roll-de-canela.jpg",
+          "productHandles": [
+            "roll-de-canela",
+            "pack-9-rolls-de-canela",
+            "combo-roll-cappu"
+          ],
+          "hotspots": [
+            {
+              "handle": "roll-de-canela",
+              "start": 1,
+              "end": 14,
+              "x": 50,
+              "y": 60
+            },
+            {
+              "handle": "pack-9-rolls-de-canela",
+              "start": 4,
+              "end": 14,
+              "x": 60,
+              "y": 38
+            }
+          ]
+        },
+        {
+          "id": "v3",
+          "title": "Café de especialidad",
+          "label": "Café",
+          "src": "/media/merece/videos/cappuccino.mp4",
+          "poster": "/media/merece/videos/cappuccino.jpg",
+          "productHandles": [
+            "cappuccino",
+            "espresso"
+          ],
+          "hotspots": [
+            {
+              "handle": "cappuccino",
+              "start": 1.5,
+              "end": 14,
+              "x": 45,
+              "y": 78
+            },
+            {
+              "handle": "espresso",
+              "start": 3,
+              "end": 14,
+              "x": 50,
+              "y": 40
+            }
+          ]
+        },
+        {
+          "id": "v4",
+          "title": "Lemon pie con merengue",
+          "label": "Lemon pie",
+          "src": "/media/merece/videos/lemon-pie.mp4",
+          "poster": "/media/merece/videos/lemon-pie.jpg",
+          "productHandles": [
+            "porcion-lemon-pie",
+            "torta-lemon-pie"
+          ],
+          "hotspots": [
+            {
+              "handle": "porcion-lemon-pie",
+              "start": 1,
+              "end": 10,
+              "x": 50,
+              "y": 45
+            },
+            {
+              "handle": "torta-lemon-pie",
+              "start": 3,
+              "end": 10,
+              "x": 40,
+              "y": 72
+            }
+          ]
+        },
+        {
+          "id": "v5",
+          "title": "Armando el pack de mini cookies",
+          "label": "Cookies",
+          "src": "/media/merece/videos/pack-12-mini-cookies.mp4",
+          "poster": "/media/merece/videos/pack-12-mini-cookies.jpg",
+          "productHandles": [
+            "pack-12-mini-cookies",
+            "mini-cookies-cappu"
+          ],
+          "hotspots": [
+            {
+              "handle": "pack-12-mini-cookies",
+              "start": 1,
+              "end": 15,
+              "x": 60,
+              "y": 70
+            },
+            {
+              "handle": "mini-cookies-cappu",
+              "start": 4,
+              "end": 15,
+              "x": 45,
+              "y": 38
+            }
+          ]
+        },
+        {
+          "id": "v6",
+          "title": "Budín marmolado",
+          "label": "Budín",
+          "src": "/media/merece/videos/budin-marmolado.mp4",
+          "poster": "/media/merece/videos/budin-marmolado.jpg",
+          "productHandles": [
+            "budin-marmolado"
+          ],
+          "hotspots": [
+            {
+              "handle": "budin-marmolado",
+              "start": 1,
+              "end": 7,
+              "x": 50,
+              "y": 50
+            }
+          ]
+        },
+        {
+          "id": "v7",
+          "title": "Torta brownie a pedido",
+          "label": "Brownie",
+          "src": "/media/merece/videos/torta-brownie.mp4",
+          "poster": "/media/merece/videos/torta-brownie.jpg",
+          "productHandles": [
+            "torta-brownie",
+            "porcion-brownie"
+          ],
+          "hotspots": [
+            {
+              "handle": "torta-brownie",
+              "start": 1,
+              "end": 8,
+              "x": 50,
+              "y": 45
+            },
+            {
+              "handle": "porcion-brownie",
+              "start": 3,
+              "end": 8,
+              "x": 55,
+              "y": 78
+            }
+          ]
+        }
+      ]
     }
   },
   "lives": {
@@ -407,6 +633,29 @@
       ],
       "status": "live",
       "pinnedProduct": "weekend-pastry-box"
+    },
+    "merece-live": {
+      "status": "live",
+      "pinnedProduct": "combo-roll-cappu",
+      "question": "¿Qué horneamos el sábado?",
+      "options": [
+        {
+          "id": "rolls",
+          "label": "Rolls de canela"
+        },
+        {
+          "id": "pie",
+          "label": "Lemon pie"
+        },
+        {
+          "id": "cookies",
+          "label": "Cookies"
+        }
+      ],
+      "welcome": {
+        "name": "Merece",
+        "text": "¡Bienvenidos! Preguntanos lo que quieras."
+      }
     }
   }
 }

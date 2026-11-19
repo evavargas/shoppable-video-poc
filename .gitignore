@@ -7,3 +7,6 @@ lib
 functions/.env
 functions/.env.*
 !functions/.env.example
+
+# Raw originals dropped here by the owner (large); only the compressed versions in widget/public/media are committed
+inbox/

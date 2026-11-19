@@ -9,7 +9,8 @@ interface ProductJson {
   handle: string;
   title: string;
   featured_image: string | null;
-  variants: { id: number; available: boolean; price: number }[]; // price in cents (a number in .js; a string in some themes' JSON)
+  options?: (string | { name: string; values?: string[] })[];
+  variants: { id: number; title?: string; available: boolean; price: number; option1?: string | null; option2?: string | null; option3?: string | null }[]; // price in cents (a number in .js; a string in some themes' JSON)
 }
 
 const shopify = () => (window as unknown as { Shopify?: ShopifyGlobal }).Shopify;
@@ -28,6 +29,22 @@ export const shopifyStore: Store = {
     // PoC: no variant picker, so use the first variant that can be bought.
     const v = p.variants.find((x) => x.available) ?? p.variants[0];
     if (!v) throw new Error(`product ${handle} has no variants`);
+    const variants = p.variants.map((x) => ({
+      id: x.id,
+      title: x.title ?? '',
+      available: x.available,
+      price: Number(x.price) / 100,
+      options: [x.option1, x.option2, x.option3].filter((o): o is string => typeof o === 'string'),
+    }));
+    // Shopify's /products/{handle}.js lists options as names (older shape) or objects with values (newer shape).
+    const options =
+      variants.length > 1
+        ? (p.options ?? []).map((o, i) => {
+            const name = typeof o === 'string' ? o : o.name;
+            const values = (typeof o === 'string' ? undefined : o.values) ?? [...new Set(variants.map((x) => x.options[i]).filter((x): x is string => Boolean(x)))];
+            return { name, values };
+          })
+        : undefined;
     return {
       handle: p.handle,
       title: p.title,
@@ -36,6 +53,7 @@ export const shopifyStore: Store = {
       variantId: v.id,
       image: p.featured_image ?? undefined,
       available: v.available,
+      ...(options?.length ? { options, variants } : {}),
     };
   },
 

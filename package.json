@@ -1,10 +1,14 @@
 {
   "name": "tienda-terry",
   "private": true,
-  "workspaces": ["widget", "functions"],
+  "workspaces": [
+    "widget",
+    "functions"
+  ],
   "scripts": {
     "emulators": "npm run build -w widget && npm run build -w functions && firebase emulators:start --project demo-terry-poc",
-    "seed": "FIRESTORE_EMULATOR_HOST=127.0.0.1:8080 node firebase/seed.mjs"
+    "seed": "FIRESTORE_EMULATOR_HOST=127.0.0.1:8080 node firebase/seed.mjs",
+    "build:products": "node scripts/build-merece-products.mjs"
   },
   "devDependencies": {
     "firebase-tools": "^15.37.0"

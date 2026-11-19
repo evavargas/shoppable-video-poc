@@ -1,6 +1,7 @@
 import { createRoot } from 'react-dom/client';
 import { App } from './App';
 import { ErrorBoundary } from './components/ErrorBoundary';
+import { setLang } from './i18n';
 import css from './widget.css?inline';
 import type { Track } from './track';
 import type { EmbedConfig, FirebaseSettings, LiveApi, Store } from './types';
@@ -14,6 +15,8 @@ export interface Deps {
 }
 
 export function mount(host: HTMLElement, { loadConfig, store, track, connectLive, fetchLiveStatus }: Deps) {
+  // The page decides the language: data-lang on the host div wins, then <html lang>.
+  setLang(host.dataset.lang ?? document.documentElement.lang);
   // Shadow DOM: the store's CSS can't reach in, ours can't leak out.
   const shadow = host.attachShadow({ mode: 'open' });
   const style = document.createElement('style');

@@ -12,7 +12,16 @@ export async function emitCartAdd(product: Product, store: Store) {
   const count = await store.getCartCount?.().catch(() => undefined);
   window.dispatchEvent(
     new CustomEvent('poc:cart-add', {
-      detail: { handle: product.handle, title: product.title, price: product.price, currency: product.currency, count },
+      detail: {
+        handle: product.handle,
+        title: product.title,
+        price: product.price,
+        currency: product.currency,
+        variantId: product.variantId,
+        variantTitle: product.variantTitle,
+        image: product.image,
+        count,
+      },
     }),
   );
 }

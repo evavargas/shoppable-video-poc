@@ -30,8 +30,9 @@ for (const [id, doc] of Object.entries(data.embeds)) {
 }
 for (const [id, doc] of Object.entries(data.lives)) {
   console.log(`lives/${id}:`, JSON.stringify(doc));
-  await db?.collection('lives').doc(id).set(doc);
+  const { welcome, ...liveDoc } = doc; // `welcome` is seed-only: the first chat message, in the language of the live
+  await db?.collection('lives').doc(id).set(liveDoc);
   // fixed id: re-running the script does not duplicate the welcome message
-  await db?.collection('lives').doc(id).collection('messages').doc('welcome').set({ name: 'Host', text: 'Welcome! Ask us anything.', at: Timestamp.now() });
+  await db?.collection('lives').doc(id).collection('messages').doc('welcome').set({ name: welcome?.name ?? 'Host', text: welcome?.text ?? 'Welcome! Ask us anything.', at: Timestamp.now() });
 }
 console.log(dry ? 'Nothing written.' : 'Done.');

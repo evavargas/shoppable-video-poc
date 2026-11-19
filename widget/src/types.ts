@@ -7,6 +7,9 @@ export interface Product {
   variantId: number; // /cart/add.js needs a variant id, not a product id
   image?: string;
   available: boolean;
+  options?: ProductOption[]; // present only when the product has more than one variant
+  variants?: Variant[];
+  variantTitle?: string; // title of the variant that was chosen, e.g. "Con glaseado / Caliente"
 }
 
 /** A tappable chip on the video while it plays: shown between `start` and `end` seconds, at x/y percent of the frame. */
@@ -16,6 +19,20 @@ export interface Hotspot {
   end: number;
   x: number; // 0..100, from the left
   y: number; // 0..100, from the top
+}
+
+export interface ProductOption {
+  name: string;
+  values: string[];
+}
+
+/** One purchasable combination of options (Shopify variant). `price` is in major units. */
+export interface Variant {
+  id: number;
+  title: string;
+  available: boolean;
+  price: number;
+  options: string[];
 }
 
 export interface Video {

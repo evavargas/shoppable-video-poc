@@ -1,4 +1,5 @@
 import { type RefObject, useEffect, useState } from 'react';
+import { t } from '../i18n';
 import type { Hotspot, Product, Store } from '../types';
 
 function Chip({ hotspot, store, onOpen }: { hotspot: Hotspot; store: Store; onOpen: (handle: string) => void }) {
@@ -20,7 +21,7 @@ function Chip({ hotspot, store, onOpen }: { hotspot: Hotspot; store: Store; onOp
       type="button"
       className={`hotspot${flip ? ' flip' : ''}`}
       style={{ left: `${hotspot.x}%`, top: `${hotspot.y}%`, maxWidth }}
-      aria-label={`Shop ${product.title}`}
+      aria-label={t('shop', { title: product.title })}
       onClick={() => onOpen(hotspot.handle)}
     >
       <span className="hs-dot" aria-hidden="true" />

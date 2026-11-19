@@ -1,5 +1,6 @@
 import { type KeyboardEvent, type TouchEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { formatPrice, prefersReducedMotion } from '../format';
+import { t } from '../i18n';
 import { root } from '../shopify';
 import type { Layout, LiveApi, Product, Store, Video } from '../types';
 import { HotspotLayer } from './Hotspots';
@@ -12,32 +13,60 @@ type Status = 'idle' | 'adding' | 'added' | 'error';
 function ProductCard({ product, store, onAdded }: { product: Product; store: Store; onAdded: (p: Product) => void }) {
   const [status, setStatus] = useState<Status>('idle');
   const [error, setError] = useState('');
+  const variants = product.variants;
+  // Start from the variant the store picked by default (the first one that can be bought).
+  const [chosen, setChosen] = useState<string[]>(() => variants?.find((v) => v.id === product.variantId)?.options ?? []);
+  const variant = variants?.find((v) => v.options.length === chosen.length && v.options.every((o, i) => o === chosen[i]));
+  // What gets added is the product with the chosen variant's id, price and stock.
+  const current: Product = variant
+    ? { ...product, variantId: variant.id, price: variant.price, available: variant.available, variantTitle: variant.title }
+    : product;
 
   async function add() {
     setStatus('adding');
     try {
-      await store.addToCart(product);
+      await store.addToCart(current);
       setStatus('added');
-      onAdded(product); // only after the cart really changed
+      onAdded(current); // only after the cart really changed
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Could not add to cart');
+      setError(e instanceof Error ? e.message : t('addFailed'));
       setStatus('error');
     }
   }
 
-  const label = !product.available
-    ? 'Sold out'
-    : { idle: 'Add to cart', adding: 'Adding…', added: 'Added ✓', error: 'Try again' }[status];
+  const label = !current.available
+    ? t('soldOut')
+    : { idle: t('addToCart'), adding: t('adding'), added: t('added'), error: t('tryAgain') }[status];
 
   return (
     <div className="product">
       {product.image && <img className="thumb" src={product.image} alt="" loading="lazy" />}
       <div className="info">
         <strong>{product.title}</strong>
-        <div>{formatPrice(product)}</div>
-        {status === 'added' && <a href={`${root()}cart`}>View cart</a>}
+        <div>{formatPrice(current)}</div>
+        <div className="opts">
+        {product.options?.map((o, i) => (
+          <select
+            key={o.name}
+            className="opt"
+            aria-label={t('chooseOption', { name: o.name })}
+            value={chosen[i] ?? ''}
+            onChange={(e) => {
+              setChosen((prev) => prev.map((v, j) => (j === i ? e.target.value : v)));
+              setStatus('idle');
+            }}
+          >
+            {o.values.map((v) => (
+              <option key={v} value={v}>
+                {v}
+              </option>
+            ))}
+          </select>
+        ))}
+        </div>
+        {status === 'added' && <a href={`${root()}cart`}>{t('viewCart')}</a>}
       </div>
-      <button type="button" className="btn" disabled={status === 'adding' || !product.available} onClick={add}>
+      <button type="button" className="btn" disabled={status === 'adding' || !current.available} onClick={add}>
         {label}
       </button>
       <span role="status" className="sr-only">
@@ -69,10 +98,10 @@ function ProductList({ video, store, onAdded }: { video: Video; store: Store; on
   if (products === undefined)
     return (
       <p className="note" role="status">
-        Loading products…
+        {t('loadingProducts')}
       </p>
     );
-  if (products.length === 0) return <p className="note">Products unavailable right now.</p>;
+  if (products.length === 0) return <p className="note">{t('productsUnavailable')}</p>;
   return (
     <>
       {products.map((p) => (
@@ -99,8 +128,8 @@ function Sheet({ handle, store, onClose, onAdded }: { handle: string; store: Sto
 
   if (!product) return null;
   return (
-    <div className="sheet" role="region" aria-label={`${product.title} details`} tabIndex={-1} ref={ref} onTouchStart={(e) => e.stopPropagation()}>
-      <button type="button" className="sheet-close" aria-label="Close product" onClick={onClose}>
+    <div className="sheet" role="region" aria-label={t('productDetails', { title: product.title })} tabIndex={-1} ref={ref} onTouchStart={(e) => e.stopPropagation()}>
+      <button type="button" className="sheet-close" aria-label={t('closeProduct')} onClick={onClose}>
         ✕
       </button>
       <ProductCard product={product} store={store} onAdded={onAdded} />
@@ -121,8 +150,8 @@ function Pinned({ handle, store, onAdded }: { handle: string; store: Store; onAd
   if (!product) return null;
   return (
     <div className="pinned">
-      <p className="pin-note">📌 Pinned by the host</p>
-      <span role="status" className="sr-only">{`The host pinned: ${product.title}`}</span>
+      <p className="pin-note">📌 {t('pinnedByHost')}</p>
+      <span role="status" className="sr-only">{t('hostPinned', { title: product.title })}</span>
       <ProductCard product={product} store={store} onAdded={onAdded} />
     </div>
   );
@@ -232,7 +261,7 @@ export function Player({ layout, videos, startIndex, store, connectLive, onOpenV
       }}
       onKeyDown={onKeyDown}
     >
-      <button type="button" className="close" aria-label="Close video" onClick={requestClose}>
+      <button type="button" className="close" aria-label={t('closeVideo')} onClick={requestClose}>
         ✕
       </button>
       <div className={`stage${layout === 'stories' ? ' story-mode' : ''}`} onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
@@ -251,10 +280,10 @@ export function Player({ layout, videos, startIndex, store, connectLive, onOpenV
         <HeartLayer items={hearts.items} remove={hearts.remove} />
         {videos.length > 1 && (
           <div className="nav">
-            <button type="button" aria-label="Previous video" disabled={index === 0} onClick={() => go(-1)}>
+            <button type="button" aria-label={t('prevVideo')} disabled={index === 0} onClick={() => go(-1)}>
               ▲
             </button>
-            <button type="button" aria-label="Next video" disabled={index === videos.length - 1} onClick={() => go(1)}>
+            <button type="button" aria-label={t('nextVideo')} disabled={index === videos.length - 1} onClick={() => go(1)}>
               ▼
             </button>
           </div>

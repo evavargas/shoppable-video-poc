@@ -4,10 +4,35 @@
   display: block;
   min-height: 300px;
   contain: layout style;
-  font: 14px/1.4 system-ui, sans-serif;
-  color: #111;
-  --accent: #111;
-  --radius: 8px;
+}
+
+/*
+ * Theming. The page can restyle the widget from OUTSIDE the Shadow DOM by setting these custom properties
+ * (they inherit across the shadow boundary): --poc-accent, --poc-accent-ink, --poc-accent-text, --poc-surface, --poc-ink,
+ * --poc-muted, --poc-line, --poc-line-strong, --poc-highlight, --poc-highlight-ink, --poc-band, --poc-band-ink,
+ * --poc-skeleton, --poc-radius, --poc-pill, --poc-font, --poc-font-display.
+ * Defaults reproduce the neutral look, and the config's theme.accent is the fallback for the accent.
+ */
+.root {
+  --a: var(--poc-accent, var(--accent, #111));
+  --a-ink: var(--poc-accent-ink, #fff);
+  --a-text: var(--poc-accent-text, var(--a));
+  --surface: var(--poc-surface, #fff);
+  --ink: var(--poc-ink, #111);
+  --muted: var(--poc-muted, #555);
+  --line: var(--poc-line, #e6e6e6);
+  --line-strong: var(--poc-line-strong, #b9b9b9);
+  --hl: var(--poc-highlight, #fff8e6);
+  --hl-ink: var(--poc-highlight-ink, #7a4b00);
+  --band: var(--poc-band, #111);
+  --band-ink: var(--poc-band-ink, #fff);
+  --skel: var(--poc-skeleton, #e6e6e6);
+  --r: var(--poc-radius, 8px);
+  --pill: var(--poc-pill, var(--poc-radius, 8px));
+  --font: var(--poc-font, system-ui, sans-serif);
+  --font-display: var(--poc-font-display, var(--font));
+  font: 14px/1.4 var(--font);
+  color: var(--ink);
 }
 
 .strip {
@@ -36,8 +61,8 @@ li {
   height: 284px;
   padding: 0;
   border: 0;
-  border-radius: var(--radius);
-  background: #e6e6e6;
+  border-radius: var(--r);
+  background: var(--skel);
   overflow: hidden;
   cursor: pointer;
 }
@@ -61,6 +86,11 @@ li {
   font-size: 13px;
   line-height: 1.25;
   text-align: left;
+}
+
+.title,
+.info strong {
+  font-family: var(--font-display);
 }
 
 .title {
@@ -111,7 +141,7 @@ button {
 }
 
 button:focus-visible {
-  outline: 3px solid var(--accent);
+  outline: 3px solid var(--a);
   outline-offset: 2px;
 }
 
@@ -271,7 +301,11 @@ button:focus-visible {
 }
 
 .products {
-  background: #fff;
+  background: var(--surface);
+  color: var(--ink);
+  max-height: 34%;
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .product {
@@ -280,23 +314,24 @@ button:focus-visible {
   justify-content: space-between;
   gap: 12px;
   padding: 12px 16px;
+  flex-wrap: wrap;
 }
 
 .thumb {
   flex: none;
   width: 56px;
   height: 56px;
-  border-radius: var(--radius);
+  border-radius: var(--r);
   object-fit: cover;
 }
 
 .info {
-  flex: 1;
   min-width: 0;
+  flex: 1 1 9rem;
 }
 
 .info a {
-  color: var(--accent);
+  color: var(--a-text);
 }
 
 .note {
@@ -308,12 +343,13 @@ button:focus-visible {
   min-height: 44px;
   padding: 0 16px;
   border: 0;
-  border-radius: var(--radius);
-  background: var(--accent);
-  color: #fff;
+  border-radius: var(--pill);
+  background: var(--a);
+  color: var(--a-ink);
   font: inherit;
   font-weight: 600;
   cursor: pointer;
+  flex: 1 1 auto;
 }
 
 .btn:disabled {
@@ -330,11 +366,11 @@ button:focus-visible {
 }
 
 .live {
-  max-height: 40%;
+  max-height: 32%;
   overflow-y: auto;
   padding: 8px 16px;
-  background: #111;
-  color: #fff;
+  background: var(--band);
+  color: var(--band-ink);
 }
 
 .live-title {
@@ -358,16 +394,16 @@ button:focus-visible {
 .option {
   flex: 1;
   min-height: 44px;
-  border: 2px solid #fff;
-  border-radius: var(--radius);
+  border: 2px solid currentColor;
+  border-radius: var(--pill);
   background: transparent;
-  color: #fff;
+  color: inherit;
   cursor: pointer;
 }
 
 .option[aria-pressed='true'] {
-  background: #fff;
-  color: #111;
+  background: var(--band-ink);
+  color: var(--band);
   font-weight: 700;
 }
 
@@ -395,8 +431,10 @@ button:focus-visible {
   min-height: 44px;
   padding: 0 12px;
   border: 0;
-  border-radius: var(--radius);
+  border-radius: var(--pill);
   font: inherit;
+  background: var(--surface);
+  color: var(--ink);
 }
 
 /* Timed product hotspots */
@@ -457,9 +495,10 @@ button:focus-visible {
   inset: auto 8px 8px 8px;
   z-index: 3;
   border-radius: 14px;
-  background: #fff;
+  background: var(--surface);
   box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
   animation: pop-in 0.18s ease-out;
+  color: var(--ink);
 }
 
 .sheet:focus {
@@ -531,18 +570,18 @@ button:focus-visible {
   width: 68px;
   height: 68px;
   box-sizing: border-box;
-  border: 3px solid var(--accent);
+  border: 3px solid var(--a);
   border-radius: 50%;
-  background: #fff;
+  background: var(--surface);
 }
 
 .ring.skeleton {
-  border-color: #e6e6e6;
-  background: #e6e6e6;
+  border-color: var(--skel);
+  background: var(--skel);
 }
 
 .story.seen .ring {
-  border-color: #b9b9b9; /* opened: the ring goes grey */
+  border-color: var(--line-strong); /* opened: the ring goes grey */
 }
 
 .ring img,
@@ -551,6 +590,7 @@ button:focus-visible {
   height: 56px;
   border-radius: 50%;
   object-fit: cover;
+  background: var(--skel);
 }
 
 .fallback {
@@ -652,6 +692,13 @@ button:focus-visible {
   object-fit: cover;
 }
 
+.mini .live-pill {
+  top: 6px;
+  left: 6px;
+  padding: 2px 6px;
+  font-size: 10px;
+}
+
 .mini-title {
   position: absolute;
   inset: auto 0 0 0;
@@ -708,7 +755,7 @@ button:focus-visible {
   min-height: 44px;
   padding: 0 12px;
   border: 0;
-  border-radius: var(--radius);
+  border-radius: var(--pill);
   background: #2a2a2a;
   color: #ff6b81;
   font-size: 16px;
@@ -743,15 +790,15 @@ button:focus-visible {
 }
 
 .pinned {
-  border-bottom: 1px solid #e6e6e6;
-  background: #fff8e6;
+  border-bottom: 1px solid var(--line);
+  background: var(--hl);
   animation: pin-in 0.35s ease-out;
 }
 
 .pin-note {
   margin: 0;
   padding: 8px 16px 0;
-  color: #7a4b00;
+  color: var(--hl-ink);
   font-size: 12px;
   font-weight: 700;
 }
@@ -768,4 +815,25 @@ button:focus-visible {
   .pinned {
     animation: none !important;
   }
+}
+
+/* Variant picker (one select per product option) */
+.opts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.opt {
+  flex: 1 1 7.5rem;
+  min-width: 0;
+  max-width: 100%;
+  padding: 6px 28px 6px 10px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--pill);
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-size: 12px;
 }

@@ -2,23 +2,30 @@
 
 [![CI](https://github.com/evavargas/shoppable-video-poc/actions/workflows/ci.yml/badge.svg)](https://github.com/evavargas/shoppable-video-poc/actions/workflows/ci.yml)
 
-**Live demo:** https://terry-shop.web.app is a fictional bakery store (Hearth & Crumb) with the widget embedded.
-The page simulates a merchant's theme and its products are Shopify-shaped JSON files; the config, live chat, poll and stats are real (Firestore + Cloud Functions).
+**Live demo:** https://terry-shop.web.app is a demo store with the widget embedded. It takes the **identity of the Merece bakery** (palette, type, pill buttons, light and dark themes, Spanish copy) and its real catalog and prices (UYU), set up as a Shopify-style storefront.
+It is a separate project from the real Merece site: nothing is synced, the real one was only read to capture the brand and the catalog. The brand and color system are documented in [`docs/BRAND.md`](docs/BRAND.md).
+The page simulates a merchant's theme and its products are Shopify-shaped JSON files (with options and variants); the config, live chat, poll and stats are real (Firestore + Cloud Functions).
 
-> **Status:** everything described below is deployed at `terry-shop.web.app`: hotspots, the stories layout, the floating live mini-player and the live extras (viewer count, hearts, pinned product).
+> **Status:** everything described below is deployed at `terry-shop.web.app`: the Merece store with its own videos, hotspots, the stories layout, the floating live mini-player and the live extras (viewer count, hearts, pinned product).
 > What is planned next (a timed coupon drop, an upcoming-live card and a host control page) and the deploy checklist are in [`docs/ROADMAP.md`](docs/ROADMAP.md).
 
 | Demo page | What it shows |
 |---|---|
-| [`/`](https://terry-shop.web.app/) | The store: "Watch & shop" carousel, product grid, cart count that reacts to the widget |
+| [`/`](https://terry-shop.web.app/) | The Merece store: stories row, "Mirá y pedí" carousel, menu with options (variants), a cart drawer with delivery zones that reacts to the widget, light/dark toggle |
 | [`/dashboard.html`](https://terry-shop.web.app/dashboard.html) | Views, clicks, add-to-carts, cart value and CTR, refreshed every 5 s |
 | [`/isolation-test.html`](https://terry-shop.web.app/isolation-test.html) | The same widget on a page with deliberately hostile CSS (red serif text, hot pink buttons): proof that the Shadow DOM isolates it |
 
-| Store page (desktop) | Store page (mobile) | Live video in the player |
-|---|---|---|
-| ![Store page on desktop](docs/store-desktop.png) | ![Store page on mobile](docs/store-mobile.png) | ![Player on a live video](docs/player-live.png) |
+| Light | Dark |
+|---|---|
+| ![Store, light theme](docs/store-mobile-light.jpg) | ![Store, dark theme](docs/store-mobile-dark.jpg) |
 
-![Analytics dashboard](docs/dashboard.png)
+| Options (variants) | Cart with delivery | Shopping from a video |
+|---|---|---|
+| ![Options dialog](docs/merece-options-mobile.jpg) | ![Cart drawer](docs/merece-cart-mobile.jpg) | ![Player with products](docs/merece-player-mobile.jpg) |
+
+Full pages: [light](docs/store-desktop-light.jpg) · [dark](docs/store-desktop-dark.jpg).
+
+![Analytics dashboard](docs/dashboard.jpg)
 
 ## What the widget does
 
@@ -56,7 +63,7 @@ Security (see `firebase/firestore.rules`): viewers can only write their own hear
 - **Hearts:** batching turns "one write per tap" into "one write per viewer per second". A very large audience would aggregate counts in a function instead of storing every batch.
 - **No auth:** anyone can delete a heartbeat, which can only lower a counter. A pinned product is only as trustworthy as the host's write access (the host control page and real auth are feature 7 on the roadmap).
 
-![Live panel with viewer count, hearts and pinned product](docs/live-hearts.png)
+![Live panel with viewer count, hearts and pinned product](docs/live-panel.jpg)
 
 ### Floating live mini-player
 
@@ -64,11 +71,11 @@ A third layout, `"floating"`, for an embedding that is placed once on every page
 Tap it and the full player opens on the live video (with chat and poll); close the player and the mini-player comes back. The ✕ dismisses it for the rest of the browser session.
 
 ```html
-<div data-source="poc" data-embedding-id="demo-live" data-layout="floating"></div>
+<div data-source="poc" data-embedding-id="merece-live" data-layout="floating"></div>
 ```
 
 The live is a Firestore document, `lives/{liveId}`, with a `status` field: `"live"`, `"scheduled"` or `"ended"`. The embedding's video that has a `liveId` is the one shown.
-To try it locally, change `status` in the Emulator UI (http://127.0.0.1:4000, Firestore, `lives/bakery-live`): the mini-player disappears and comes back in real time.
+To try it locally, change `status` in the Emulator UI (http://127.0.0.1:4000, Firestore, `lives/merece-live`): the mini-player disappears and comes back in real time.
 
 **Staying cheap and lazy.** The mini-player is on every page, so what it costs when nothing is happening matters most:
 
@@ -81,7 +88,7 @@ The trade-off: the check is a snapshot, so a live that starts while the page is 
 
 The host div has `data-layout="floating"` and no height, and `:host` drops `contain: layout` for it, because layout containment would make the host the containing block of the `position: fixed` mini-player and pin it inside the tiny host instead of the viewport.
 
-![Mini-player on the store page](docs/mini-player.png)
+![Mini-player on the store page](docs/mini-player.jpg)
 
 ### Stories layout (Instagram-style Timeline)
 
@@ -99,11 +106,11 @@ The same embedding mechanism, a different `layout` in the Firestore document:
 - **Tracking:** opening a story is `story_open` (not `video_click`); the dashboard's "Opens" card adds both, so CTR is comparable between layouts.
 
 ```html
-<div data-source="poc" data-embedding-id="demo-stories" data-layout="stories" style="min-height: 104px"></div>
+<div data-source="poc" data-embedding-id="merece-stories" data-layout="stories" style="min-height: 104px"></div>
 ```
 
-![Stories bar at the top of the store page](docs/stories-bar.png)
-![Story player with progress bars](docs/player-stories.png)
+![Stories bar at the top of the store page](docs/store-mobile-light.jpg)
+![Story player with progress bars](docs/player-stories.jpg)
 
 ### Timed product hotspots ("shop the look" on video)
 
@@ -134,13 +141,25 @@ a typo in one hotspot can't remove the others or the video. Events are validated
 
 | Player with two hotspots | Product card opened from a hotspot |
 |---|---|
-| ![Hotspots on a video](docs/player-hotspots.png) | ![Product card over the video](docs/player-hotspot-card.png) |
+| ![Hotspots on a video](docs/player-hotspots.jpg) | ![Product card over the video](docs/player-hotspot-card.jpg) |
 
 ### One widget, many embeddings
 
-Each embedding id is a Firestore document, so the same `widget.js` serves different stores. This repo seeds two:
-`demo-bakery` (the fictional store above, with Shopify-shaped mock products) and `home-carousel` (a real Shopify development store).
+Each embedding id is a Firestore document, so the same `widget.js` serves different stores. This repo seeds four:
+`merece-demo` (carousel), `merece-stories` (stories layout) and `merece-live` (floating mini-player), all on the Merece demo store, and `home-carousel` (a real Shopify development store with its own three products).
 Adding a client is adding a document; no build or deploy.
+
+### Shopify format: options become variants
+
+Products follow Shopify's storefront shape (`/products/{handle}.js`, prices in cents). In Merece, choices like milk, glaze or hot/cold are **options**, and every combination is a **variant** with its own id, exactly like Shopify:
+the catalog in `scripts/merece-catalog.json` (15 products, 41 variants) is turned into storefront files by `npm run build:products`.
+The widget reads `options` and `variants` and shows a select per option in the player's product card; the price, the stock and the id sent to `/cart/add.js` follow the chosen variant.
+The page's own "Elegir" dialog works with the same data, so the two entry points can't disagree.
+
+### Theming and language of the widget
+
+The widget exposes a small `--poc-*` custom-property contract (colors, radius, fonts) that crosses the Shadow DOM boundary, so a store restyles it from its own CSS and a theme toggle updates it instantly; and it speaks the page's language (`<html lang>`).
+Both are described in [`docs/BRAND.md`](docs/BRAND.md).
 
 ### Updating the store's cart count
 
@@ -148,23 +167,22 @@ A widget can't know how a theme draws its cart, so after a successful `/cart/add
 
 ```js
 window.addEventListener('poc:cart-add', (e) => {
-  // e.detail = { handle, title, price, currency, count }  (count = Shopify's cart item_count when available)
+  // e.detail = { handle, title, price, currency, variantId, variantTitle, image, count }  (count = Shopify's cart item_count when available)
 });
 ```
 
-The demo page listens and updates its header badge. On a real Shopify theme the listener would use the **Section Rendering API**:
+The demo page listens and builds a cart line from it (variant id, title, price, image), so what you add from a video appears in the store's own cart drawer. On a real Shopify theme the listener would use the **Section Rendering API**:
 `fetch(`${Shopify.routes.root}?sections=cart-icon-bubble`)` returns the HTML of the theme's own cart-count section already rendered by Liquid,
 and the listener swaps it into the header. That keeps the markup, translations and styling owned by the theme.
 
 ### Media credits
 
-Videos and product photos are frames and clips from [Pexels](https://www.pexels.com/) creators, used under the [Pexels License](https://www.pexels.com/license/) (free to use and modify, attribution not required but given):
-Michael Burrows ([coffee pour](https://www.pexels.com/video/pouring-black-coffee-into-a-cup-7118100/)),
+**Product photos, prices and the Merece demo videos** are the owner's own material (the Merece bakery), used with her permission for this demo. The videos are her clips, trimmed to 8 to 30 s, re-encoded to 720p H.264 (about 18 MB for all seven) with a poster frame each; the originals stay outside git (`inbox/`, ignored).
+The one remaining set of third-party clips is used only by the `home-carousel` embedding of the Shopify development store: clips from [Pexels](https://www.pexels.com/) creators under the [Pexels License](https://www.pexels.com/license/) (free to use and modify, attribution not required but given):
 Anna Tarazevich ([croissant](https://www.pexels.com/video/a-person-dipping-a-croissant-on-chocolate-6741736/)),
 Uriel Mont ([pastry case](https://www.pexels.com/video/a-low-angle-shot-of-a-pastry-shop-6307657/)),
-Eva Bronzini ([flatbreads](https://www.pexels.com/video/a-person-shaping-the-dough-using-rolling-pin-7237140/)),
-Pavel Danilyuk ([kneading](https://www.pexels.com/video/a-person-kneading-dough-6942821/)).
-They are trimmed to 12 s, re-encoded to 720p H.264 and stripped of audio. These files are not covered by this repository's code license. The brand, products and prices are fictional.
+Eva Bronzini ([flatbreads](https://www.pexels.com/video/a-person-shaping-the-dough-using-rolling-pin-7237140/)).
+These files are not covered by this repository's code license.
 
 An embeddable carousel of short vertical videos for a Shopify store. Tapping a video opens a full-screen player with the tagged product and a real **Add to cart**. A "live" video also shows realtime chat and a poll. Views, clicks and add-to-carts are tracked, and one number answers "how much cart value did the videos drive?".
 
@@ -272,7 +290,8 @@ flowchart LR
 
 ```
 widget/      React + TypeScript widget (Vite library mode), tests with Vitest + Testing Library.
-             widget/public/ is the demo site: store page, dashboard, isolation test, media/ and Shopify-shaped products/*.js
+             widget/public/ is the demo site: the Merece store (index.html, merece.css, merece.js), dashboard, isolation test, fonts, media/ and generated products/*.js
+scripts/     the Merece catalog (merece-catalog.json) and its generators (build:products, contrast table)
 functions/   Cloud Functions (Node + TypeScript): getEmbedConfig, track, getStats, event validation + test
 firebase/    Firestore rules, seed data and script (firebase.json and .firebaserc live at the repo root: the CLI only deploys folders inside its project directory)
 shopify/     custom-liquid.html: the snippet to paste into a theme

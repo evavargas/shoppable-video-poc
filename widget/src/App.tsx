@@ -97,7 +97,7 @@ export function App({ embeddingId, onFail, loadConfig, store, track, connectLive
 
   if (!config) {
     if (layoutHint === 'floating') return null; // nothing to reserve: it floats
-    return layoutHint === 'stories' ? <StoriesSkeleton /> : <CarouselSkeleton />;
+    return <div className="root">{layoutHint === 'stories' ? <StoriesSkeleton /> : <CarouselSkeleton />}</div>;
   }
 
   const layout = config.layout ?? 'carousel';
@@ -105,7 +105,7 @@ export function App({ embeddingId, onFail, loadConfig, store, track, connectLive
   const trackOpen = (videoId: string) => track({ type: layout === 'stories' ? 'story_open' : 'video_click', videoId });
 
   return (
-    <div style={{ '--accent': config.theme.accent } as CSSProperties}>
+    <div className="root" style={{ '--accent': config.theme.accent } as CSSProperties}>
       {layout === 'floating' ? (
         <MiniPlayer
           embeddingId={embeddingId}

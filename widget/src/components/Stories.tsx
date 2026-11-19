@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { t } from '../i18n';
 import type { Video } from '../types';
 import { useInView } from './useInView';
 
@@ -27,14 +28,14 @@ function Avatar({ video, seen, onOpen, onView }: AvatarProps) {
       ref={ref}
       type="button"
       className={`story${seen ? ' seen' : ''}`}
-      aria-label={`Open story: ${video.title}${video.liveId ? ', live' : ''}${seen ? ', seen' : ''}`}
+      aria-label={`${t('openStory', { title: video.title })}${video.liveId ? t('liveSuffix') : ''}${seen ? t('seenSuffix') : ''}`}
       onClick={onOpen}
     >
       <span className="ring">
         {video.poster ? <img src={video.poster} alt="" loading="lazy" width="56" height="56" /> : <span className="fallback">{label.slice(0, 1)}</span>}
         {video.liveId && (
           <span className="story-live" aria-hidden="true">
-            LIVE
+            {t('live')}
           </span>
         )}
       </span>
@@ -58,7 +59,7 @@ export function Stories({
   onView: (v: Video) => void;
 }) {
   return (
-    <ul className="stories" aria-label="Stories">
+    <ul className="stories" aria-label={t('stories')}>
       {videos.map((v, i) => (
         <li key={v.id}>
           <Avatar video={v} seen={seen.has(v.id)} onOpen={() => onOpen(i)} onView={onView} />
@@ -71,7 +72,7 @@ export function Stories({
 /** Same height as the real row, so nothing jumps when the config arrives. */
 export function StoriesSkeleton() {
   return (
-    <div className="stories" aria-busy="true" aria-label="Loading stories">
+    <div className="stories" aria-busy="true" aria-label={t('loadingStories')}>
       {[0, 1, 2, 3, 4].map((i) => (
         <div key={i} className="story">
           <span className="ring skeleton" />

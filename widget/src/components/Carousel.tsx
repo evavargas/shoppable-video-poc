@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { formatPrice, prefersReducedMotion } from '../format';
+import { t } from '../i18n';
 import type { Product, Store, Video } from '../types';
 import { useInView } from './useInView';
 
@@ -48,19 +49,19 @@ function VideoCard({ video, store, onOpen, onView }: CardProps) {
       ref={card}
       type="button"
       className="card"
-      aria-label={`Watch: ${video.title}${video.liveId ? ', live' : ''}`}
+      aria-label={`${t('watch', { title: video.title })}${video.liveId ? t('liveSuffix') : ''}`}
       onClick={onOpen}
     >
       <video ref={el} src={loaded ? video.src : undefined} poster={video.poster} muted loop playsInline preload="metadata" />
       {video.liveId && (
         <span className="live-pill" aria-hidden="true">
           <span className="dot" />
-          LIVE
+          {t('live')}
         </span>
       )}
       <span className="label">
         <span className="title">{video.title}</span>
-        {product && <span className="price">{product.available ? formatPrice(product) : 'Sold out'}</span>}
+        {product && <span className="price">{product.available ? formatPrice(product) : t('soldOut')}</span>}
       </span>
     </button>
   );
@@ -75,7 +76,7 @@ interface Props {
 
 export function Carousel({ videos, store, onOpen, onView }: Props) {
   return (
-    <ul className="strip" aria-label="Shop the videos">
+    <ul className="strip" aria-label={t('shopVideos')}>
       {videos.map((v, i) => (
         <li key={v.id}>
           <VideoCard video={v} store={store} onOpen={() => onOpen(i)} onView={onView} />
@@ -88,7 +89,7 @@ export function Carousel({ videos, store, onOpen, onView }: Props) {
 /** Same height as the real strip so nothing jumps when config arrives. */
 export function CarouselSkeleton() {
   return (
-    <div className="strip" aria-busy="true" aria-label="Loading videos">
+    <div className="strip" aria-busy="true" aria-label={t('loadingVideos')}>
       {[0, 1, 2].map((i) => (
         <div key={i} className="card" />
       ))}

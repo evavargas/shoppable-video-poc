@@ -470,6 +470,75 @@ describe('Floating live mini-player', () => {
   });
 });
 
+describe('Variant picker (Shopify options)', () => {
+  const coffee: Product = {
+    handle: 'cappu',
+    title: 'Cappuccino',
+    price: 220,
+    currency: 'USD',
+    variantId: 10,
+    available: true,
+    options: [
+      { name: 'Leche', values: ['Entera', 'Avena'] },
+      { name: 'Temperatura', values: ['Caliente', 'Fría'] },
+    ],
+    variants: [
+      { id: 10, title: 'Entera / Caliente', available: true, price: 220, options: ['Entera', 'Caliente'] },
+      { id: 11, title: 'Entera / Fría', available: true, price: 220, options: ['Entera', 'Fría'] },
+      { id: 12, title: 'Avena / Caliente', available: true, price: 250, options: ['Avena', 'Caliente'] },
+      { id: 13, title: 'Avena / Fría', available: false, price: 250, options: ['Avena', 'Fría'] },
+    ],
+  };
+  const cfg: EmbedConfig = { ...config, videos: [{ id: 'v1', src: 'https://x.test/v1.mp4', title: 'Café', productHandles: ['cappu'] }] };
+
+  const open = async () => {
+    const store = makeStore(coffee);
+    render(<App embeddingId="t" loadConfig={async () => cfg} store={store} track={track} connectLive={connectLive} fetchLiveStatus={fetchLiveStatus} onFail={() => {}} />);
+    await userEvent.click(await screen.findByRole('button', { name: /watch: café/i }));
+    await screen.findByRole('dialog');
+    return store;
+  };
+
+  it('shows one select per option, starting on the default variant', async () => {
+    await open();
+    expect(await screen.findByRole('combobox', { name: 'Choose Leche' })).toHaveValue('Entera');
+    expect(screen.getByRole('combobox', { name: 'Choose Temperatura' })).toHaveValue('Caliente');
+  });
+
+  it('adds the chosen variant with its own id and price, and tracks that price', async () => {
+    const store = await open();
+    await userEvent.selectOptions(await screen.findByRole('combobox', { name: 'Choose Leche' }), 'Avena');
+    expect(screen.getByText('$250.00')).toBeInTheDocument(); // the price follows the variant
+
+    await userEvent.click(screen.getByRole('button', { name: /add to cart/i }));
+    expect(store.addToCart).toHaveBeenCalledWith(expect.objectContaining({ variantId: 12, price: 250, variantTitle: 'Avena / Caliente' }));
+    await vi.waitFor(() => expect(track).toHaveBeenCalledWith({ type: 'add_to_cart', videoId: 'v1', productHandle: 'cappu', value: 250, currency: 'USD' }));
+  });
+
+  it('disables a combination that is sold out', async () => {
+    await open();
+    await userEvent.selectOptions(await screen.findByRole('combobox', { name: 'Choose Leche' }), 'Avena');
+    await userEvent.selectOptions(screen.getByRole('combobox', { name: 'Choose Temperatura' }), 'Fría');
+    expect(screen.getByRole('button', { name: /sold out/i })).toBeDisabled();
+  });
+
+  it('tells the host page which variant was added, so the store can build its cart line', async () => {
+    const heard = vi.fn();
+    const listener = (e: Event) => heard((e as CustomEvent).detail);
+    window.addEventListener('poc:cart-add', listener);
+    try {
+      await open();
+      await userEvent.selectOptions(await screen.findByRole('combobox', { name: 'Choose Temperatura' }), 'Fría');
+      await userEvent.click(screen.getByRole('button', { name: /add to cart/i }));
+      await vi.waitFor(() =>
+        expect(heard).toHaveBeenCalledWith(expect.objectContaining({ handle: 'cappu', variantId: 11, variantTitle: 'Entera / Fría', price: 220, currency: 'USD' })),
+      );
+    } finally {
+      window.removeEventListener('poc:cart-add', listener);
+    }
+  });
+});
+
 describe('App', () => {
   it('opens the player and adds the product to the cart', async () => {
     const store = makeStore();

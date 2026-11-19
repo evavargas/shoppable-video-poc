@@ -44,6 +44,50 @@ describe('shopifyStore.getProduct', () => {
   });
 });
 
+describe('shopifyStore.getProduct options and variants', () => {
+  const withOptions = {
+    handle: 'cappu',
+    title: 'Cappuccino',
+    featured_image: null,
+    options: [{ name: 'Leche', position: 1, values: ['Entera', 'Avena'] }],
+    variants: [
+      { id: 10, title: 'Entera', option1: 'Entera', available: false, price: 22000 },
+      { id: 11, title: 'Avena', option1: 'Avena', available: true, price: 24000 },
+    ],
+  };
+
+  it('exposes options and variants when there is more than one variant, and defaults to the first one that can be bought', async () => {
+    stubFetch({ ok: true, json: async () => withOptions });
+    const p = await shopifyStore.getProduct('cappu');
+    expect(p.variantId).toBe(11);
+    expect(p.price).toBe(240);
+    expect(p.options).toEqual([{ name: 'Leche', values: ['Entera', 'Avena'] }]);
+    expect(p.variants).toEqual([
+      { id: 10, title: 'Entera', available: false, price: 220, options: ['Entera'] },
+      { id: 11, title: 'Avena', available: true, price: 240, options: ['Avena'] },
+    ]);
+  });
+
+  it('understands the older shape where options are just names, deriving the values from the variants', async () => {
+    stubFetch({ ok: true, json: async () => ({ ...withOptions, options: ['Leche'] }) });
+    const p = await shopifyStore.getProduct('cappu');
+    expect(p.options).toEqual([{ name: 'Leche', values: ['Entera', 'Avena'] }]);
+  });
+
+  it('adds no options for a single-variant product', async () => {
+    stubFetch({ ok: true, json: async () => ({ ...withOptions, variants: [withOptions.variants[1]], options: ['Title'] }) });
+    const p = await shopifyStore.getProduct('cappu');
+    expect(p.options).toBeUndefined();
+    expect(p.variants).toBeUndefined();
+  });
+
+  it('asks Shopify for the cart count', async () => {
+    const fetchFn = stubFetch({ ok: true, json: async () => ({ item_count: 4 }) });
+    await expect(shopifyStore.getCartCount!()).resolves.toBe(4);
+    expect(fetchFn).toHaveBeenCalledWith('/cart.js');
+  });
+});
+
 describe('shopifyStore.addToCart', () => {
   const product = { variantId: 2 } as Product;
 
