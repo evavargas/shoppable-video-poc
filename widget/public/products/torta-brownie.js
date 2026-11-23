@@ -1,11 +1,11 @@
 {
-  "id": 7014,
+  "id": 7016,
   "handle": "torta-brownie",
   "title": "Torta brownie",
   "description": "9 porciones. Intensa, de chocolate.",
-  "product_type": "tortas",
+  "product_type": "video",
   "tags": [
-    "tortas",
+    "video",
     "anticipacion-48h"
   ],
   "price": 140000,
@@ -22,7 +22,7 @@
   ],
   "variants": [
     {
-      "id": 51040,
+      "id": 51044,
       "title": "Default Title",
       "option1": null,
       "option2": null,
@@ -32,5 +32,5 @@
       "position": 1
     }
   ],
-  "position": 15
+  "position": 17
 }

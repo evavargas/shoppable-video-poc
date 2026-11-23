@@ -1,8 +1,8 @@
 {
-  "id": 7009,
+  "id": 7011,
   "handle": "americano",
   "title": "Americano",
-  "description": "36 g de café + 150 ml de agua.",
+  "description": "2 shots de espresso + agua. Elegí: caliente o frío.",
   "product_type": "bebidas",
   "tags": [
     "bebidas"
@@ -22,7 +22,7 @@
   ],
   "variants": [
     {
-      "id": 51028,
+      "id": 51032,
       "title": "Caliente",
       "option1": "Caliente",
       "option2": null,
@@ -32,7 +32,7 @@
       "position": 1
     },
     {
-      "id": 51029,
+      "id": 51033,
       "title": "Fría",
       "option1": "Fría",
       "option2": null,
@@ -42,5 +42,5 @@
       "position": 2
     }
   ],
-  "position": 10
+  "position": 12
 }

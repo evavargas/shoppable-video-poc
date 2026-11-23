@@ -3,9 +3,9 @@
   "handle": "porcion-brownie",
   "title": "Porción brownie",
   "description": "Intensa, de chocolate.",
-  "product_type": "postres",
+  "product_type": "video",
   "tags": [
-    "postres"
+    "video"
   ],
   "price": 24000,
   "available": false,

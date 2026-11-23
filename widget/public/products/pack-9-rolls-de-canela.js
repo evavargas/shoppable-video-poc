@@ -3,9 +3,9 @@
   "handle": "pack-9-rolls-de-canela",
   "title": "Pack 9 rolls de canela",
   "description": "Nueve rolls para compartir.",
-  "product_type": "postres",
+  "product_type": "video",
   "tags": [
-    "postres"
+    "video"
   ],
   "price": 180000,
   "available": true,

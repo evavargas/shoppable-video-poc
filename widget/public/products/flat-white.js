@@ -1,8 +1,8 @@
 {
-  "id": 7011,
+  "id": 7013,
   "handle": "flat-white",
   "title": "Flat white",
-  "description": "2 shots de espresso + leche a elección.",
+  "description": "2 shots de espresso + leche (a elección).",
   "product_type": "bebidas",
   "tags": [
     "bebidas"
@@ -23,7 +23,7 @@
   ],
   "variants": [
     {
-      "id": 51033,
+      "id": 51037,
       "title": "Leche entera",
       "option1": "Leche entera",
       "option2": null,
@@ -33,7 +33,7 @@
       "position": 1
     },
     {
-      "id": 51034,
+      "id": 51038,
       "title": "Deslactosada",
       "option1": "Deslactosada",
       "option2": null,
@@ -43,7 +43,7 @@
       "position": 2
     },
     {
-      "id": 51035,
+      "id": 51039,
       "title": "Vegetal (avena)",
       "option1": "Vegetal (avena)",
       "option2": null,
@@ -53,5 +53,5 @@
       "position": 3
     }
   ],
-  "position": 12
+  "position": 14
 }

@@ -3,9 +3,9 @@
   "handle": "espresso",
   "title": "Espresso",
   "description": "36 g de café de especialidad.",
-  "product_type": "bebidas",
+  "product_type": "video",
   "tags": [
-    "bebidas"
+    "video"
   ],
   "price": 10000,
   "available": true,

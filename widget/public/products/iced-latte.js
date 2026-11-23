@@ -1,5 +1,5 @@
 {
-  "id": 7012,
+  "id": 7014,
   "handle": "iced-latte",
   "title": "Iced latte",
   "description": "1 shot de espresso + leche a elección + hielo.",
@@ -23,7 +23,7 @@
   ],
   "variants": [
     {
-      "id": 51036,
+      "id": 51040,
       "title": "Leche entera",
       "option1": "Leche entera",
       "option2": null,
@@ -33,7 +33,7 @@
       "position": 1
     },
     {
-      "id": 51037,
+      "id": 51041,
       "title": "Deslactosada",
       "option1": "Deslactosada",
       "option2": null,
@@ -43,7 +43,7 @@
       "position": 2
     },
     {
-      "id": 51038,
+      "id": 51042,
       "title": "Vegetal (avena)",
       "option1": "Vegetal (avena)",
       "option2": null,
@@ -53,5 +53,5 @@
       "position": 3
     }
   ],
-  "position": 13
+  "position": 15
 }

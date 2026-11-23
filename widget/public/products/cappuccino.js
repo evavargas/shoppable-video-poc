@@ -1,8 +1,8 @@
 {
-  "id": 7010,
+  "id": 7012,
   "handle": "cappuccino",
   "title": "Cappuccino",
-  "description": "1 shot de espresso + leche a elección.",
+  "description": "1 shot de espresso + leche (a elección).",
   "product_type": "bebidas",
   "tags": [
     "bebidas"
@@ -23,7 +23,7 @@
   ],
   "variants": [
     {
-      "id": 51030,
+      "id": 51034,
       "title": "Leche entera",
       "option1": "Leche entera",
       "option2": null,
@@ -33,7 +33,7 @@
       "position": 1
     },
     {
-      "id": 51031,
+      "id": 51035,
       "title": "Deslactosada",
       "option1": "Deslactosada",
       "option2": null,
@@ -43,7 +43,7 @@
       "position": 2
     },
     {
-      "id": 51032,
+      "id": 51036,
       "title": "Vegetal (avena)",
       "option1": "Vegetal (avena)",
       "option2": null,
@@ -53,5 +53,5 @@
       "position": 3
     }
   ],
-  "position": 11
+  "position": 13
 }
