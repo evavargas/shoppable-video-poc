@@ -25,7 +25,7 @@
         <a class="brand" href="#inicio" aria-label="Merece, ir al inicio"><span data-wordmark></span></a>
         <nav aria-label="Secciones">
           <a href="#mira">Mirá y pedí</a>
-          <a href="#carta">Carta</a>
+          <a href="#carta">Productos</a>
           <a href="#zonas">Zonas</a>
         </nav>
         <div class="header-actions">
@@ -38,70 +38,99 @@
       </div>
     </header>
 
-    <!-- Stories row: same widget, "stories" layout (set in Firestore). data-layout lets the loading skeleton match; min-height reserves the space. -->
-    <div class="stories-bar">
-      <div class="wrap">
-        <div class="embed" data-source="poc" data-embedding-id="merece-stories" data-layout="stories" data-store="mock" style="min-height: 104px"></div>
-      </div>
-    </div>
-
     <main>
-      <section class="hero" id="inicio">
-        <div class="wrap">
-          <span class="cup" data-cup></span>
-          <h1><span data-wordmark></span></h1>
-          <p class="tagline"><span>Pastelería Sin Gluten</span><span>y</span><span>Café de especialidad</span></p>
-          <div class="actions">
-            <a class="btn btn-primary" href="#carta">Ver la carta</a>
-            <a class="btn btn-outline" href="#mira">Mirá y pedí</a>
+      <div class="hero-zone">
+        <!-- Stories row: same widget, "stories" layout (set in Firestore). data-layout lets the loading skeleton match; min-height reserves the space. -->
+        <div class="stories-bar">
+          <div class="wrap">
+            <div class="embed" data-source="poc" data-embedding-id="merece-stories" data-layout="stories" data-store="mock" style="min-height: 104px"></div>
           </div>
         </div>
-      </section>
 
-      <div class="band">
-        <section id="mira" aria-labelledby="mira-title">
+        <section class="hero" id="inicio">
+          <div class="sprinkles" aria-hidden="true">
+          <span class="sprinkle a" style="left:6%;top:14%;width:16px;height:6px;--r:-25deg;--d:0s"></span>
+          <span class="sprinkle h md" style="left:14%;top:42%;width:8px;height:8px;--r:0deg;--d:1.2s"></span>
+          <span class="sprinkle h md" style="left:22%;top:70%;width:14px;height:5px;--r:35deg;--d:2.4s"></span>
+          <span class="sprinkle a" style="left:4%;top:82%;width:7px;height:7px;--r:0deg;--d:0.6s"></span>
+          <span class="sprinkle a md" style="left:28%;top:22%;width:6px;height:6px;--r:0deg;--d:3.1s"></span>
+          <span class="sprinkle h" style="left:94%;top:18%;width:14px;height:5px;--r:30deg;--d:0.9s"></span>
+          <span class="sprinkle a md" style="left:86%;top:46%;width:9px;height:9px;--r:0deg;--d:1.8s"></span>
+          <span class="sprinkle a md" style="left:76%;top:72%;width:16px;height:6px;--r:-35deg;--d:2.9s"></span>
+          <span class="sprinkle h" style="left:95%;top:84%;width:7px;height:7px;--r:0deg;--d:0.3s"></span>
+          <span class="sprinkle h md" style="left:72%;top:20%;width:6px;height:6px;--r:0deg;--d:3.6s"></span>
+          </div>
           <div class="wrap">
-            <h2 id="mira-title" class="sr-only">Te lo merecés. Mirá y pedí</h2>
-            <p class="neon-sign display" data-neon="Te lo merecés" aria-hidden="true"></p>
-            <p class="section-note">Mirá cómo lo hacemos y pedilo sin salir del video.</p>
+            <span class="cup" data-cup></span>
+            <h1><span data-wordmark></span></h1>
+            <p class="tagline"><span>Pastelería Sin Gluten</span><span>&amp;</span><span>Café de especialidad</span></p>
+          </div>
+        </section>
+
+        <section id="mira" aria-labelledby="mira-title" style="padding-bottom: 3rem">
+          <div class="wrap">
+            <h2 id="mira-title" class="sr-only">Mirá y pedí</h2>
+            <p class="neon-sign" data-neon="Mirá y pedí" data-tone="accent" aria-hidden="true" style="--carta: var(--drip)"></p>
+            <p class="section-note" style="margin-bottom: 1rem">Mirá cómo lo hacemos y pedilo sin salir del video.</p>
             <!-- The carousel widget. min-height is inline so the space is reserved BEFORE widget.js loads (no layout shift). -->
             <div class="embed" data-source="poc" data-embedding-id="merece-demo" data-store="mock" style="min-height: 300px"></div>
           </div>
         </section>
-
-        <section id="carta" aria-label="Carta">
-          <div class="wrap" id="carta-lista" aria-live="polite"></div>
-        </section>
       </div>
 
-      <section class="light-section" id="pasos" aria-labelledby="pasos-title">
+      <section class="carta" id="carta" aria-label="Carta">
+        <div class="drip" aria-hidden="true"></div>
+        <div class="wrap">
+          <h2 class="sr-only">Te lo merecés</h2>
+          <p class="neon-sign carta-title" data-neon="Te lo merecés" aria-hidden="true"></p>
+          <div id="carta-lista" aria-live="polite"></div>
+        </div>
+      </section>
+
+      <section class="light-section fade-in pasos" id="pasos" aria-labelledby="pasos-title">
         <div class="wrap">
           <h2 id="pasos-title">Pedí en tres pasos</h2>
           <ol class="steps">
-            <li class="step"><span class="n">1</span><h3>Elegí</h3><p>Armá tu pedido desde la carta o directo desde los videos.</p></li>
-            <li class="step"><span class="n">2</span><h3>Confirmá</h3><p>Revisá tu carrito, elegí retiro o envío y mandanos el pedido.</p></li>
-            <li class="step"><span class="n">3</span><h3>Disfrutá :)</h3><p>Lo preparamos y te lo llevamos. Pago por transferencia.</p></li>
+            <li class="step"><span class="n">1</span>
+              <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 22h36l-3 30a4 4 0 0 1-4 3H21a4 4 0 0 1-4-3Z" fill="#b9a5d6"/><path d="M24 22v-5a8 8 0 0 1 16 0v5"/><path d="M32 46c-6-4-8-7-8-10a4.5 4.5 0 0 1 8-2.5A4.5 4.5 0 0 1 40 36c0 3-2 6-8 10Z" fill="#f0ae86"/></svg>
+              <h3>Armá tu pedido</h3></li>
+            <li class="step"><span class="n">2</span>
+              <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 14h44a2 2 0 0 1 2 2v26a2 2 0 0 1-2 2H34l-12 10V44H10a2 2 0 0 1-2-2V16a2 2 0 0 1 2-2Z" fill="#f0ae86"/><path d="m22 29 8 8 14-14"/></svg>
+              <h3>Confirmá tu compra</h3></li>
+            <li class="step"><span class="n">3</span>
+              <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="14" width="20" height="14" rx="3" fill="#b9a5d6"/><path d="M10 20h12"/><circle cx="16" cy="46" r="9"/><circle cx="48" cy="46" r="9"/><path d="M16 46 28 28h12l8 18M36 22h6"/></svg>
+              <h3>Te lo enviamos</h3></li>
           </ol>
         </div>
       </section>
 
-      <section class="light-section alt" id="zonas" aria-labelledby="zonas-title">
+      <section class="light-section fade-in zonas" id="zonas" aria-labelledby="zonas-title">
         <div class="wrap">
           <h2 id="zonas-title">Zonas de entrega</h2>
           <div class="zones">
-            <p class="section-note" style="color: var(--muted-fg); margin: 0; text-align: center">Delivery en el día. Tocá tu zona para ver el costo del envío.</p>
             <ul class="zone-list" id="zone-list"></ul>
-            <p class="zone-result" id="zone-result" role="status">Para pedidos con anticipación, consultanos.</p>
+            <p class="zone-result" id="zone-result" role="status">Tocá tu zona para ver el costo del envío.</p>
           </div>
+          <p class="zones-note">Delivery en el día · para pedidos con anticipación, consultanos.</p>
         </div>
       </section>
 
-      <section class="band cta" aria-labelledby="ig-title">
+      <section class="cierre" aria-labelledby="ig-title">
+        <div class="sprinkles" aria-hidden="true">
+          <span class="sprinkle a" style="left:6%;top:14%;width:16px;height:6px;--r:-25deg;--d:0s"></span>
+          <span class="sprinkle h md" style="left:18%;top:60%;width:7px;height:7px;--r:0deg;--d:1.4s"></span>
+          <span class="sprinkle h md" style="left:30%;top:24%;width:10px;height:5px;--r:20deg;--d:2.2s"></span>
+          <span class="sprinkle h" style="left:92%;top:20%;width:14px;height:5px;--r:30deg;--d:0.8s"></span>
+          <span class="sprinkle a md" style="left:80%;top:66%;width:16px;height:6px;--r:-30deg;--d:2.6s"></span>
+          <span class="sprinkle a md" style="left:66%;top:18%;width:6px;height:6px;--r:0deg;--d:3.2s"></span>
+          <span class="sprinkle a" style="left:4%;top:84%;width:7px;height:7px;--r:0deg;--d:0.5s"></span>
+          <span class="sprinkle h md" style="left:88%;top:86%;width:8px;height:8px;--r:0deg;--d:1.1s"></span>
+        </div>
         <div class="wrap">
           <h2 id="ig-title" class="sr-only">Date el gusto, te lo merecés</h2>
-          <p class="neon-sign display small" data-neon="Date el gusto, te lo merecés" aria-hidden="true"></p>
+          <p class="neon-sign small" data-neon="Date el gusto" data-tone="accent" aria-hidden="true"></p>
           <p>Seguinos en Instagram.</p>
-          <a class="btn" href="#inicio">@merece.demo</a>
+          <a class="btn" href="#inicio"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.6" fill="currentColor"/></svg>@merece.demo</a>
         </div>
       </section>
     </main>
@@ -120,7 +149,7 @@
         </div>
         <div class="bottom">
           <span data-wordmark></span>
-          <span>© 2026 Demo basada en la identidad de Merece · <a href="/dashboard.html">Analítica</a> · <a href="/host.html">Panel del live</a> · <a href="/isolation-test.html">Prueba de aislamiento</a></span>
+          <span>© 2026 Demo basada en la identidad de Merece · <a href="/dashboard.html">Analítica</a> · <a href="/isolation-test.html">Prueba de aislamiento</a> · <a href="/host.html">Panel del live</a></span>
           <button class="icon-btn" type="button" data-theme-toggle aria-pressed="false" aria-label="Cambiar a tema oscuro"></button>
         </div>
       </div>

@@ -26,9 +26,9 @@
 
   const SECTIONS = [
     { type: 'combos', title: 'Combos', tone: 'accent' },
-    { type: 'postres', title: 'Deli merecidos', tone: 'accent', note: 'Hechos hoy, listos para llevar.' },
-    { type: 'bebidas', title: '¿Sin bebida para acompañar el postre?', tone: 'accent', hand: true },
-    { type: 'tortas', title: 'Vos pedí y te lo preparamos', tone: 'highlight', note: '48 hs de anticipación', big: true },
+    { type: 'postres', title: 'Deli merecidos', tone: 'accent' },
+    { type: 'bebidas', title: '¿Qué café te llevás hoy?', tone: 'accent' },
+    { type: 'tortas', title: 'Para momentos especiales', tone: 'ink', big: true, sub: '48 hs de anticipación' },
   ];
 
   // ---------- Theme (light by default; the toggle remembers; the system preference is NOT forced, like on Merece) ----------
@@ -48,12 +48,12 @@
   setTheme(document.documentElement.classList.contains('dark') ? 'dark' : 'light', false);
   $$('[data-theme-toggle]').forEach((b) => b.addEventListener('click', () => setTheme(document.documentElement.classList.contains('dark') ? 'light' : 'dark')));
 
-  // ---------- Wordmark (letters with a slight tilt, like the logo) ----------
+  // ---------- Wordmark (a lavender-topped M and the rest, like the current logo) ----------
   $$('[data-wordmark]').forEach((el) => {
     el.classList.add('wordmark');
     el.setAttribute('role', 'img');
     el.setAttribute('aria-label', 'Merece');
-    el.innerHTML = [...'Merece'].map((c) => `<span aria-hidden="true">${c}</span>`).join('');
+    el.innerHTML = '<span aria-hidden="true">M</span><span aria-hidden="true">erece</span>';
   });
   $$('[data-cup]').forEach((el) => (el.innerHTML = CUP));
 
@@ -62,7 +62,7 @@
     const text = el.dataset.neon;
     el.setAttribute('aria-hidden', 'true'); // the real heading is a separate .sr-only element
     el.classList.add('neon');
-    el.dataset.tone = el.dataset.tone || 'highlight';
+    el.dataset.tone = el.dataset.tone || 'ink';
     el.innerHTML = text.split(' ').map((w) => `<span style="display:inline-block;white-space:nowrap">${[...w].map((c) => `<span class="neon-letter">${esc(c)}</span>`).join('')}</span>`).join(' ');
     if (reduceMotion) return el.setAttribute('data-lit', 'true');
     new IntersectionObserver(([e]) => el.setAttribute('data-lit', String(e.isIntersecting)), { threshold: 0.6 }).observe(el);
@@ -130,12 +130,12 @@
     const advance = p.tags.some((t) => t.startsWith('anticipacion'));
     const hasOptions = p.variants.length > 1;
     return `<li class="product${soldOut ? ' sold-out' : ''}">
-      <div class="photo">${photo(p)}${advance ? '<span class="tag">A pedido</span>' : ''}</div>
+      <div class="photo">${photo(p)}</div>
       <div class="body">
         <div class="top"><h3>${esc(p.title)}</h3><span class="price">${hasOptions ? 'desde ' : ''}${money(p.price)}</span></div>
         <p class="desc">${esc(p.description)}</p>
-        ${advance ? '<p class="meta">24 h no alcanzan: pedila con 48 hs</p>' : ''}
-        <div class="pick"><button class="btn btn-sm" type="button" data-pick="${esc(p.handle)}" ${soldOut ? 'disabled' : ''}>${soldOut ? 'Sin stock por hoy' : 'Elegir'}</button></div>
+        ${advance ? '<p class="meta">A pedido · 48 hs de anticipación</p>' : ''}
+        <div class="pick"><button class="btn btn-primary btn-sm" type="button" data-pick="${esc(p.handle)}" ${soldOut ? 'disabled' : ''}>${soldOut ? 'Sin stock por hoy' : 'Elegir'}</button></div>
       </div>
     </li>`;
   }
@@ -144,10 +144,10 @@
     const host = $('#carta-lista');
     host.innerHTML = SECTIONS.map((s) => {
       const items = products.filter((p) => p.product_type === s.type);
-      const cls = `neon-sign${s.hand ? '' : ' display'}${s.big ? '' : ' small'}`;
+      const cls = `neon-sign${s.big ? '' : ' small'}`;
+      const sub = s.sub ? `<div class="section-head"><span class="neon-sign small" data-neon="${esc(s.sub)}" data-tone="accent"></span></div>` : '';
       return `<section aria-labelledby="h-${s.type}">
-        <div class="section-head"><h2 id="h-${s.type}" class="sr-only">${esc(s.title)}</h2><span class="${cls}" data-neon="${esc(s.title)}" data-tone="${s.tone}"></span></div>
-        ${s.note ? `<p class="section-note">${esc(s.note)}</p>` : ''}
+        ${s.big ? `<h2 id="h-${s.type}" class="sr-only">${esc(s.title)}</h2><p class="neon-sign" data-neon="${esc(s.title)}" data-tone="${s.tone}" style="margin-top:3.5rem"></p>${sub}` : `<div class="section-head"><h2 id="h-${s.type}" class="sr-only">${esc(s.title)}</h2><span class="${cls}" data-neon="${esc(s.title)}" data-tone="${s.tone}"></span></div>`}
         <ul class="grid">${items.map(productCard).join('')}</ul>
       </section>`;
     }).join('');
@@ -303,7 +303,7 @@
   $('#order-done').addEventListener('click', () => { cart.items = []; save(); render(); $('#order').close(); drawer.close(); say('Pedido de demostración enviado'); });
 
   // ---------- Zones section ----------
-  $('#zone-list').innerHTML = ZONES.map((z) => `<li><button class="zone" type="button" data-zone="${z.id}" aria-pressed="false"><span><i class="dot" style="background:${z.color}" aria-hidden="true"></i><b>${esc(z.name)}</b></span><span>${money(z.fee)}</span></button></li>`).join('');
+  $('#zone-list').innerHTML = ZONES.map((z) => `<li><button class="zone" type="button" data-zone="${z.id}" aria-pressed="false"><span><i class="dot" style="background:${z.color}" aria-hidden="true"></i><b>${esc(z.name)}</b></span><span class="fee">${money(z.fee)}</span></button></li>`).join('');
   $('#zone-list').addEventListener('click', (e) => {
     const b = e.target.closest('[data-zone]');
     if (!b) return;

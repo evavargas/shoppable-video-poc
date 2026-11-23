@@ -1,34 +1,36 @@
 <!doctype html>
-<html lang="en">
+<html lang="es-UY">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Video analytics</title>
+    <meta name="robots" content="noindex" />
+    <meta name="color-scheme" content="light dark" />
+    <title>Analítica de videos · Merece (demo)</title>
+    <link rel="icon" href="/brand/merece-icon.png" />
+    <link rel="stylesheet" href="/merece.css" />
+    <script>try { if (localStorage.getItem('merece-demo-theme') === 'dark') document.documentElement.classList.add('dark'); } catch (e) {}</script>
     <style>
-      :root { --bg: #f1f3f5; --ink: #1b1f24; --muted: #5b636d; --line: #dde1e6; --card: #fff; --accent: #9a3412; --good: #2f6f3e; }
-      * { box-sizing: border-box; }
-      body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
-      main { max-width: 1000px; margin: 0 auto; padding: 24px 16px 48px; }
-      header { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px; margin-bottom: 20px; }
-      h1 { margin: 0; font-size: 26px; }
-      .meta { color: var(--muted); font-size: 14px; }
-      a { color: var(--accent); }
-      h2 { margin: 28px 0 12px; font-size: 14px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
-      .cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
-      .card { padding: 16px; background: var(--card); border: 1px solid var(--line); border-radius: 14px; }
-      .card .label { color: var(--muted); font-size: 13px; }
-      .card .value { margin-top: 4px; font-size: 30px; font-weight: 700; font-variant-numeric: tabular-nums; }
-      .card .hint { margin-top: 2px; color: var(--muted); font-size: 12px; }
-      .card.key .value { color: var(--good); }
-      .error { padding: 12px 16px; border: 1px solid #e5b4a8; border-radius: 12px; background: #fdf0ec; color: #7a2a14; }
-      @media (min-width: 720px) { .cards { grid-template-columns: repeat(3, 1fr); } h1 { font-size: 30px; } }
+      main.dash { padding-block: 1.5rem 3rem; }
+      .dash header { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0.5rem 1rem; margin-bottom: 1.25rem; }
+      .dash h1 { font-family: var(--font-display); font-size: clamp(2rem, 6vw, 2.75rem); font-weight: 400; line-height: 1.1; }
+      .meta { font-size: 0.875rem; color: var(--muted-fg); }
+      .dash h2 { margin: 2rem 0 0.75rem; font-size: 0.8rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted-fg); }
+      .cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
+      .card { padding: 1rem; border-radius: 0.9rem; background: var(--tile-card); color: var(--tile-fg); }
+      .card .label { font-size: 0.8rem; color: var(--tile-muted); }
+      .card .value { margin-top: 0.25rem; font-family: var(--font-display); font-size: 1.9rem; line-height: 1.1; font-variant-numeric: tabular-nums; }
+      .card .hint { margin-top: 0.15rem; font-size: 0.75rem; color: var(--tile-muted); }
+      .card.key { background: var(--btn-accent); color: var(--on-color); }
+      .card.key .label, .card.key .hint { color: var(--on-color); }
+      .error { padding: 0.75rem 1rem; border: 2px solid var(--danger); border-radius: 0.9rem; font-weight: 700; }
+      @media (min-width: 720px) { .cards { grid-template-columns: repeat(3, 1fr); } }
     </style>
   </head>
   <body>
-    <main>
+    <main class="dash wrap">
       <header>
-        <h1>Video analytics</h1>
-        <span class="meta"><span id="updated">Loading…</span> · <a href="/">Back to the demo store</a></span>
+        <h1>Analítica de videos</h1>
+        <span class="meta"><span id="updated">Cargando…</span> · <a href="/">Volver a la tienda</a></span>
       </header>
       <div id="out" aria-live="off"></div>
     </main>
@@ -40,8 +42,8 @@
 
       const KNOWN = ['views', 'clicks', 'storyOpens', 'addToCarts', 'addToCartValue', 'currency'];
       const pct = (a, b) => (b > 0 ? `${((a / b) * 100).toFixed(1)}%` : '–');
-      const num = (n) => new Intl.NumberFormat().format(n);
-      const money = (v, cur) => new Intl.NumberFormat(undefined, { style: 'currency', currency: cur || 'USD' }).format(v);
+      const num = (n) => new Intl.NumberFormat('es-UY').format(n);
+      const money = (v, cur) => new Intl.NumberFormat('es-UY', { style: 'currency', currency: cur || 'UYU' }).format(v);
       const label = (k) => k.replace(/([A-Z])/g, ' $1').replace(/_/g, ' ').replace(/^./, (c) => c.toUpperCase());
 
       const card = (name, value, hint, key) =>
@@ -54,12 +56,12 @@
         return `
           <h2>${s.embeddingId}</h2>
           <div class="cards">
-            ${card('Views', num(s.views), 'videos seen playing')}
-            ${card('Opens', num(opens), 'videos or stories opened')}
-            ${card('Add to carts', num(s.addToCarts), 'from the player')}
-            ${card('Cart value', money(s.addToCartValue, s.currency), 'attributed to video', true)}
-            ${card('CTR', pct(opens, s.views), 'opens / views')}
-            ${card('Add-to-cart rate', pct(s.addToCarts, opens), 'add to carts / opens')}
+            ${card('Vistas', num(s.views), 'videos reproducidos')}
+            ${card('Aperturas', num(opens), 'videos o historias abiertos')}
+            ${card('Agregados al carrito', num(s.addToCarts), 'desde el reproductor')}
+            ${card('Valor en carrito', money(s.addToCartValue, s.currency), 'atribuido al video', true)}
+            ${card('CTR', pct(opens, s.views), 'aperturas / vistas')}
+            ${card('Tasa de carrito', pct(s.addToCarts, opens), 'agregados / aperturas')}
             ${extra.map((k) => card(label(k), num(s[k]))).join('')}
           </div>`;
       }
@@ -69,9 +71,9 @@
         try {
           const all = await Promise.all(EMBEDDINGS.map((id) => fetch(`/api/stats?id=${encodeURIComponent(id)}`).then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); })));
           out.innerHTML = all.map(render).join('');
-          document.getElementById('updated').textContent = `Updated ${new Date().toLocaleTimeString()}`;
+          document.getElementById('updated').textContent = `Actualizado ${new Date().toLocaleTimeString('es-UY')}`;
         } catch (e) {
-          out.innerHTML = '<p class="error">Could not load stats. Is the API running?</p>';
+          out.innerHTML = '<p class="error">No se pudieron cargar las estadísticas. ¿Está andando la API?</p>';
         }
       }
       refresh();

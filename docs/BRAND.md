@@ -6,9 +6,9 @@ This store (`widget/public/index.html`, `merece.css`, `merece.js`) adopts the id
 
 | | From Merece (kept) | Added here |
 |---|---|---|
-| Colors | brown `#3D2825`, deep brown `#2A1A18`, ivory `#FFFFF0`, sand `#F3EFDF`, lavender `#B9A5D6`, peach `#F0AE86` | text-safe lavender and peach, stronger control borders, status colors, dark-mode elevation steps, a brighter unlit neon |
+| Colors | brown `#3D2825`, deep brown `#2A1A18`, ivory `#FFFFF0`, sand `#F3EFDF`, lavender `#B9A5D6`, peach `#F0AE86` | text-safe lavender and peach, stronger control borders, status colors, dark-mode elevation steps, a soft "neon" for the hand-lettered titles |
 | Type | Bagel Fat One (display), Gochi Hand (hand), Roboto Mono (body) | self-hosted `woff2` files (no third-party font request), `font-display: swap`, preload for the two used above the fold |
-| Shape | pill buttons, `1rem` cards, the cup icon, the tilted wordmark | hover/active/disabled states for every button, forced-colors fallbacks |
+| Shape | pill buttons, `1rem` cards, the cup icon, the wordmark (a lavender-topped M, then "erece") | hover/active/disabled states for every button, forced-colors fallbacks |
 | Themes | light by default, a toggle, no forced dark from the system | the choice is remembered, and the **widget follows it with no JavaScript** (see below) |
 | Voice | rioplatense Spanish (voseo) | the widget itself now speaks Spanish on a Spanish page |
 
@@ -24,20 +24,42 @@ All colors live as CSS custom properties in `widget/public/merece.css`. Componen
 | `--fg` | `#3D2825` | `#FFFFF0` | text |
 | `--muted-fg` | `#6B534F` | `#D9C9C0` | secondary text |
 | `--border` / `--border-strong` | `#DDD5BE` / `#8A736E` | `#5A423D` / `#A28D87` | decoration / the edge of an input or control |
-| `--primary` / `--on-primary` | `#3D2825` / `#FFFFF0` | `#B9A5D6` / `#3D2825` | main button (swaps with the theme) |
+| `--primary` / `--on-primary` | `#3D2825` / `#FFFFF0` | `#F0AE86` / `#3D2825` | toast and small solid UI (swaps with the theme) |
+| `--btn-accent` / `--on-color` | `#B9A5D6` / `#3D2825` | `#F0AE86` / `#3D2825` | **every main button** ("Elegir", "Enviar pedido"): lavender in light, peach in dark, like the Merece site |
 | `--accent` / `--accent-ink` | `#B9A5D6` / `#3D2825` | same | lavender fills, badges, "Elegir" buttons |
 | `--accent-text` | `#5E4496` | `#B9A5D6` | lavender you can **read** as text |
 | `--highlight` / `--highlight-ink` | `#F0AE86` / `#3D2825` | same | peach fills and favorites |
 | `--highlight-text` | `#8F4418` | `#F0AE86` | peach you can **read** as text |
 | `--danger` / `--success` / `--warning` | `#B3261E` / `#2F6B3F` / `#7A5000` | `#FF8A80` / `#86D69E` / `#F2C46B` | status |
-| `--band` / `--band-fg` | `#3D2825` / `#FFFFF0` | `#241513` / `#FFFFF0` | dark sections (menu, neon signs) |
+| `--band` / `--band-fg` | `#3D2825` / `#FFFFF0` | `#241513` / `#FFFFF0` | the demo strip and the widget's live panel |
 | `--ring` | `#3D2825` | `#B9A5D6` | focus ring |
+
+### Section colors (refreshed from the current Merece site, Nov 2026)
+
+The Merece site changed from a dark brown menu band with neon signs to a **peach menu with drips**. The store follows it, in both themes:
+
+| Token | Light | Dark | Where |
+|---|---|---|---|
+| `--carta` / `--carta-fg` | `#FCE8DA` / `#3D2825` | `#56261C` / `#FFFFF0` | the menu section |
+| `--drip` | = `--bg` (ivory) | `#7A4024` | hero + video row, and the drips that fall into the menu |
+| `--tile-card` | `#FFFFFF` | `#F0E2C8` | product cards (they stay light in dark mode, text stays brown) |
+| `--tile-step` / `--tile-panel` | menu peach / ivory | `#F0E2C8` | step tiles, zone list |
+| `--pasos` | ivory | `#7A4024` | "Pedí en tres pasos" (a gradient from the menu fades into it) |
+| `--zonas` | `#EEE8F7` | `#5C3828` | delivery zones |
+| `--cierre` | `#FCE8DA` | `#EFE0B8` | closing section between two wavy edges |
+| `--footer` / `--drawer` | sand / ivory | `#5C3828` | footer, cart drawer and dialogs |
+| `--scrim` | `#3D282566` | `#0F08069E` | behind dialogs |
+| `--title-accent` | `#6A4C9C` | `#B9A5D6` | lavender hand-lettered titles on the menu |
+
+The hand-lettered titles are no longer glowing tubes on a dark band: they are solid ink on the section color that lights a little (soft glow) when they scroll into view, and sit still under `prefers-reduced-motion`. Each title has wavy lines at its sides.
+
+The widget follows the same colors through the `--poc-*` contract: its buttons now use `--btn-accent` (lavender / peach) with brown text, and its focus ring uses `--poc-ring` (brown / lavender) because lavender alone is too weak as a focus indicator on ivory.
 
 Three decisions behind the changes:
 
 - **Lavender and peach never carry text on ivory.** In the original rules they are only fills. This system adds two dedicated text colors (`--accent-text`, `--highlight-text`) so links and small labels can use the brand hues and still pass.
 - **Control borders had 3.4:1; they now have 4.4:1** (light) so inputs and chips are clearly visible. Pure decoration (`--border`) stays soft on purpose.
-- **Dark bands get deeper in dark mode** (`#241513` instead of the same brown as the cards). Before, cards on the brown band had the same color as the band and disappeared; now they lift off it by elevation.
+- **Cards stay light in dark mode** (`--tile-card`), as on the Merece site, so photos and brown text keep a strong contrast; the sections around them get warmer browns (`--carta`, `--drip`, `--zonas`).
 
 ## Contrast (WCAG 2.2, computed by `node scripts/contrast-table.mjs`)
 
@@ -65,8 +87,20 @@ Text needs 4.5:1, large text and the edge of a control need 3:1. Every pair belo
 | Success text on page | `#2f6b3f` on `#fffff0` | 6.3 | 4.5 | pass |
 | Warning text on page | `#7a5000` on `#fffff0` | 7.0 | 4.5 | pass |
 | Text on dark band | `#fffff0` on `#3d2825` | 13.6 | 4.5 | pass |
-| Neon peach, tube off, on band | `#ac7b61` on `#3d2825` | 3.8 | 3 | pass |
-| Neon lavender, tube off, on band | `#8a7693` on `#3d2825` | 3.3 | 3 | pass |
+| Text on button (lavender / peach fill) | `#3d2825` on `#b9a5d6` | 6.2 | 4.5 | pass |
+| Title on the carta (ink, unlit 90%) | `#503b37` on `#fce8da` | 8.8 | 3 | pass |
+| Lavender title on the carta (unlit 90%) | `#795ca2` on `#fce8da` | 4.6 | 3 | pass |
+| Lavender title on the hero color (unlit 90%) | `#795ea4` on `#fffff0` | 5.3 | 3 | pass |
+| Text on product card / tile | `#3d2825` on `#ffffff` | 13.7 | 4.5 | pass |
+| Muted text on product card / tile | `#6b534f` on `#ffffff` | 7.1 | 4.5 | pass |
+| Card note (#5e4496) on card / tile | `#5e4496` on `#ffffff` | 7.7 | 4.5 | pass |
+| Text on lavender zones section | `#3d2825` on `#eee8f7` | 11.5 | 4.5 | pass |
+| Text on footer | `#3d2825` on `#f3efdf` | 11.9 | 4.5 | pass |
+| Muted text on footer | `#6b534f` on `#f3efdf` | 6.1 | 4.5 | pass |
+| Footer link on footer | `#5e4496` on `#f3efdf` | 6.6 | 4.5 | pass |
+| Text on drawer | `#3d2825` on `#fffff0` | 13.6 | 4.5 | pass |
+| Muted text on drawer | `#6b534f` on `#fffff0` | 7.0 | 4.5 | pass |
+| Text on closing section | `#3d2825` on `#fce8da` | 11.6 | 4.5 | pass |
 | Focus ring on page | `#3d2825` on `#fffff0` | 13.6 | 3 | pass |
 
 ### Dark
@@ -78,7 +112,7 @@ Text needs 4.5:1, large text and the edge of a control need 3:1. Every pair belo
 | Text on elevated surface | `#fffff0` on `#4a332f` | 11.5 | 4.5 | pass |
 | Muted text on page | `#d9c9c0` on `#2a1a18` | 10.4 | 4.5 | pass |
 | Muted text on elevated surface | `#d9c9c0` on `#4a332f` | 7.2 | 4.5 | pass |
-| Primary button label | `#3d2825` on `#b9a5d6` | 6.2 | 4.5 | pass |
+| Primary button label | `#3d2825` on `#f0ae86` | 7.3 | 4.5 | pass |
 | Text on lavender fill | `#3d2825` on `#b9a5d6` | 6.2 | 4.5 | pass |
 | Text on peach fill | `#3d2825` on `#f0ae86` | 7.3 | 4.5 | pass |
 | Lavender as text (accent-text) on page | `#b9a5d6` on `#2a1a18` | 7.5 | 4.5 | pass |
@@ -91,12 +125,21 @@ Text needs 4.5:1, large text and the edge of a control need 3:1. Every pair belo
 | Success text on page | `#86d69e` on `#2a1a18` | 9.6 | 4.5 | pass |
 | Warning text on page | `#f2c46b` on `#2a1a18` | 10.2 | 4.5 | pass |
 | Text on dark band | `#fffff0` on `#241513` | 17.5 | 4.5 | pass |
-| Neon peach, tube off, on band | `#a2745a` on `#241513` | 4.3 | 3 | pass |
-| Neon lavender, tube off, on band | `#806e8c` on `#241513` | 3.8 | 3 | pass |
+| Text on button (lavender / peach fill) | `#3d2825` on `#f0ae86` | 7.3 | 4.5 | pass |
+| Title on the carta (ink, unlit 90%) | `#eee9db` on `#56261c` | 10.2 | 3 | pass |
+| Lavender title on the carta (unlit 90%) | `#af98c3` on `#56261c` | 4.8 | 3 | pass |
+| Lavender title on the hero color (unlit 90%) | `#b39bc4` on `#7a4024` | 3.2 | 3 | pass |
+| Text on product card / tile | `#3d2825` on `#f0e2c8` | 10.7 | 4.5 | pass |
+| Muted text on product card / tile | `#6b534f` on `#f0e2c8` | 5.5 | 4.5 | pass |
+| Card note (#5e4496) on card / tile | `#5e4496` on `#f0e2c8` | 6.0 | 4.5 | pass |
+| Text on lavender zones section | `#fffff0` on `#5c3828` | 10.1 | 4.5 | pass |
+| Text on footer | `#fffff0` on `#5c3828` | 10.1 | 4.5 | pass |
+| Muted text on footer | `#d9c9c0` on `#5c3828` | 6.4 | 4.5 | pass |
+| Footer link on footer | `#f0ae86` on `#5c3828` | 5.4 | 4.5 | pass |
+| Text on drawer | `#fffff0` on `#5c3828` | 10.1 | 4.5 | pass |
+| Muted text on drawer | `#d9c9c0` on `#5c3828` | 6.4 | 4.5 | pass |
+| Text on closing section | `#3d2825` on `#efe0b8` | 10.5 | 4.5 | pass |
 | Focus ring on page | `#b9a5d6` on `#2a1a18` | 7.5 | 3 | pass |
-
-
-The neon signs are decorative (`aria-hidden`, the real heading is a separate `h2`), but they are legible even with the tube "off" (3.3:1) instead of fading into the band.
 
 ## Theming the widget from the outside
 
