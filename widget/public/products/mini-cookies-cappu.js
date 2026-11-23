@@ -9,7 +9,7 @@
   ],
   "price": 35000,
   "available": true,
-  "featured_image": "/media/merece/products/pack-12-mini-cookies.jpg",
+  "featured_image": "/media/merece/products/mini-cookies-cappu.jpg",
   "options": [
     {
       "name": "Leche",

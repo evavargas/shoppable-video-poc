@@ -269,7 +269,7 @@ section[id] { scroll-margin-top: 4.5rem; }
 .grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 1.5rem; margin: 0; padding: 0; list-style: none; }
 .product { flex: 1 1 15rem; min-width: 0; max-width: 100%; display: flex; flex-direction: column; overflow: hidden; border-radius: 0.9rem; background: var(--tile-card); color: var(--tile-fg); }
 .product .photo { position: relative; aspect-ratio: 4 / 3; background: var(--peach); }
-.product .photo img { width: 100%; height: 100%; object-fit: cover; }
+.product .photo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; } /* absolute: a tall photo must be cropped to 4:3, never stretch the card */
 .product .photo .placeholder { display: grid; place-items: center; width: 100%; height: 100%; color: var(--brown); }
 .product .photo .placeholder svg { width: 38%; height: 38%; opacity: 0.85; }
 .product .body { display: flex; flex: 1; flex-direction: column; gap: 0.35rem; padding: 1.25rem; }

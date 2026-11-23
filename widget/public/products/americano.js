@@ -9,7 +9,7 @@
   ],
   "price": 15000,
   "available": true,
-  "featured_image": "/media/merece/products/espresso.jpg",
+  "featured_image": "/media/merece/products/americano.jpg",
   "options": [
     {
       "name": "Temperatura",

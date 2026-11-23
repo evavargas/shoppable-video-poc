@@ -9,7 +9,7 @@
   ],
   "price": 43000,
   "available": true,
-  "featured_image": "/media/merece/products/roll-de-canela.jpg",
+  "featured_image": "/media/merece/products/combo-roll-cappu.jpg",
   "options": [
     {
       "name": "Glaseado",

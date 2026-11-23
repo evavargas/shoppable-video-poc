@@ -9,7 +9,7 @@
   ],
   "price": 22000,
   "available": true,
-  "featured_image": "/media/merece/products/cappuccino.jpg",
+  "featured_image": "/media/merece/products/flat-white.jpg",
   "options": [
     {
       "name": "Leche",

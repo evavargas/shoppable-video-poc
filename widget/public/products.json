@@ -12,7 +12,7 @@
    ],
    "price": 43000,
    "available": true,
-   "featured_image": "/media/merece/products/roll-de-canela.jpg",
+   "featured_image": "/media/merece/products/combo-roll-cappu.jpg",
    "options": [
     {
      "name": "Glaseado",
@@ -175,7 +175,7 @@
    ],
    "price": 35000,
    "available": true,
-   "featured_image": "/media/merece/products/pack-12-mini-cookies.jpg",
+   "featured_image": "/media/merece/products/mini-cookies-cappu.jpg",
    "options": [
     {
      "name": "Leche",
@@ -555,7 +555,7 @@
    ],
    "price": 15000,
    "available": true,
-   "featured_image": "/media/merece/products/espresso.jpg",
+   "featured_image": "/media/merece/products/americano.jpg",
    "options": [
     {
      "name": "Temperatura",
@@ -658,7 +658,7 @@
    ],
    "price": 22000,
    "available": true,
-   "featured_image": "/media/merece/products/cappuccino.jpg",
+   "featured_image": "/media/merece/products/flat-white.jpg",
    "options": [
     {
      "name": "Leche",
